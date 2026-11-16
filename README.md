@@ -10,7 +10,6 @@ Swami Desikan's **மும்மணிக்கோவை** line by line as it i
 - **Minimize** (`–` or `M`) shrinks it to a slim pill that shows only the current line. Click `⤢` to expand it again.
 - **×** hides it to the system tray. Bring it back from the tray icon or with **Ctrl + Alt + L**.
 - **Loops** the recitation and starts again from the taniyan when it ends. You can turn this off in ⚙.
-- Shows **Tamil, Latin transliteration, or both** (`அ` button or `T`).
 - Settings for background transparency, text size, a timing offset, showing the small video, and *Start with Windows* (in the tray menu).
 
 ## Get it
@@ -53,7 +52,6 @@ If everything is consistently a bit early or late, use **Timing offset** (±0.5 
 | Space | Play / pause (in Sync mode: mark line) |
 | ↑ / ↓ | Previous / next line |
 | ← / → | Back / forward 5 s |
-| T | Tamil → Latin → both |
 | M | Minimize / expand |
 | Ctrl + Alt + L | Show / hide from anywhere |
 

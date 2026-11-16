@@ -38,7 +38,6 @@ button { font: inherit; color: inherit; }
   opacity: .8; text-shadow: 0 1px 3px rgba(0,0,0,.6);
 }
 .icon:hover { background: rgba(var(--fg), .14); opacity: 1; }
-#btnScript { font-family: var(--tamil); font-size: 12px; }
 
 /* chrome fades away while playing, comes back on hover (like a lyrics overlay should) */
 .bar .buttons, .controls { transition: opacity .25s; }
@@ -86,10 +85,6 @@ body.playing:not(:hover) .controls { opacity: 0; }
   color: var(--accent); opacity: .75; letter-spacing: .04em;
   -webkit-text-fill-color: var(--accent);
 }
-.line .lat { display: none; font-family: var(--latin); }
-body[data-script="lat"] .line .ta { display: none; }
-body[data-script="lat"] .line .lat { display: inline; font-size: .95em; }
-body[data-script="both"] .line .lat { display: block; font-size: .7em; font-weight: 500; opacity: .85; }
 
 /* sync mode */
 .sync-banner {
@@ -115,7 +110,6 @@ kbd { font: inherit; font-size: 10px; padding: 0 4px; border-radius: 4px; backgr
   flex: 1; min-width: 0; font-family: var(--tamil); font-size: 13px; font-weight: 600;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,.6);
 }
-body[data-script="lat"] .pill-text { font-family: var(--latin); }
 body.compact .panel { border-radius: 26px; background: rgba(14, 12, 18, max(var(--bg-a), .6)); }
 body.compact .bar, body.compact .controls, body.compact .viewport, body.compact .sheet, body.compact .sync-banner { display: none !important; }
 body.compact .pill { display: flex; }

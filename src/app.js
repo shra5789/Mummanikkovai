@@ -12,7 +12,7 @@
     onCompactChanged: () => {}, onCommand: () => {},
   };
 
-  const S = { opacity: 0.55, font: 1, script: 'ta', offset: 0, video: false, loop: true, timings: null };
+  const S = { opacity: 0.55, font: 1, offset: 0, video: false, loop: true, timings: null };
   let times = DEFAULT_TIMES.slice();
   let player = null;
   let active = -2;
@@ -28,8 +28,8 @@
     return ans;
   }
   function verseName(v) {
-    if (v === 0) return 'தனியன் · taniyaṉ';
-    if (v === 99) return 'வாழி · nigamanam';
+    if (v === 0) return 'தனியன்';
+    if (v === 99) return 'வாழி';
     return `பாசுரம் ${v} / 10`;
   }
   let toastTimer;
@@ -50,9 +50,7 @@
         li.classList.add('verse-start');
         li.dataset.verse = ln.v === 0 ? 'தனியன்' : ln.v === 99 ? 'வாழி' : ln.v;
       }
-      const ta = document.createElement('span'); ta.className = 'ta'; ta.textContent = ln.text;
-      const lat = document.createElement('span'); lat.className = 'lat'; lat.textContent = toLatin(ln.text);
-      li.append(ta, lat);
+      li.textContent = ln.text;
       li.addEventListener('click', () => {
         if (sync) return;
         player.seek(t0(i) + 0.01); player.play(); userScrollUntil = 0;
@@ -79,7 +77,7 @@
     });
     const ln = L.lines[Math.max(i, 0)];
     $('verseLabel').textContent = i < 0 ? '' : verseName(ln.v);
-    $('pillText').textContent = i < 0 ? L.title : (S.script === 'lat' ? toLatin(ln.text) : ln.text);
+    $('pillText').textContent = i < 0 ? L.title : ln.text;
     if (performance.now() > userScrollUntil) scrollToActive(Math.abs(i - prev) < 4);
   }
 
@@ -177,9 +175,7 @@
   function applyLook() {
     document.documentElement.style.setProperty('--bg-a', S.opacity);
     document.documentElement.style.setProperty('--scale', S.font);
-    document.body.dataset.script = S.script;
     document.body.classList.toggle('show-video', !!S.video);
-    $('btnScript').textContent = S.script === 'ta' ? 'அ' : S.script === 'lat' ? 'A' : 'அA';
     $('offVal').textContent = (S.offset >= 0 ? '+' : '') + S.offset.toFixed(1) + 's';
     if (player) player.loop = !!S.loop && !sync;
     active = -2; // refresh pill text
@@ -190,7 +186,7 @@
       : 'Timings are estimates. Use “Sync timings” once — tap Space as each line begins — to make them exact.';
   }
   function openSheet() {
-    $('optOpacity').value = S.opacity; $('optFont').value = S.font; $('optScript').value = S.script; $('optVideo').checked = !!S.video; $('optLoop').checked = !!S.loop;
+    $('optOpacity').value = S.opacity; $('optFont').value = S.font; $('optVideo').checked = !!S.video; $('optLoop').checked = !!S.loop;
     updateTimingNote();
     $('sheet').classList.remove('hidden');
   }
@@ -211,10 +207,8 @@
     $('btnClose').onclick = () => store.hide();
     $('btnSettings').onclick = () => ($('sheet').classList.contains('hidden') ? openSheet() : closeSheet());
     $('btnSheetClose').onclick = closeSheet;
-    $('btnScript').onclick = () => { save({ script: { ta: 'lat', lat: 'both', both: 'ta' }[S.script] }); applyLook(); };
     $('optOpacity').oninput = (e) => { save({ opacity: +e.target.value }); applyLook(); };
     $('optFont').oninput = (e) => { save({ font: +e.target.value }); applyLook(); };
-    $('optScript').onchange = (e) => { save({ script: e.target.value }); applyLook(); };
     $('optVideo').onchange = (e) => { save({ video: e.target.checked }); applyLook(); };
     $('optLoop').onchange = (e) => { save({ loop: e.target.checked }); applyLook(); };
     $('offMinus').onclick = () => { save({ offset: Math.round((S.offset - 0.5) * 10) / 10 }); applyLook(); };
@@ -246,7 +240,6 @@
         case 'ArrowLeft': player && player.seek(player.time() - 5); break;
         case 'ArrowRight': player && player.seek(player.time() + 5); break;
         case 'KeyM': store.setCompact(!document.body.classList.contains('compact')); break;
-        case 'KeyT': $('btnScript').click(); break;
         case 'Escape': closeSheet(); break;
       }
     });

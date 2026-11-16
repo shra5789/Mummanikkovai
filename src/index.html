@@ -17,7 +17,6 @@
         <span id="verseLabel" class="verse-label"></span>
       </div>
       <div class="buttons nodrag">
-        <button id="btnScript" class="icon" title="Tamil / Latin / both (T)">அ</button>
         <button id="btnSettings" class="icon" title="Settings">⚙</button>
         <button id="btnMin" class="icon" title="Minimize (M)">–</button>
         <button id="btnClose" class="icon" title="Hide to tray (Ctrl+Alt+L brings it back)">×</button>
@@ -54,13 +53,6 @@
       <div class="sheet-head"><b>Settings</b><button id="btnSheetClose" class="icon">×</button></div>
       <label>Background <input id="optOpacity" type="range" min="0" max="0.95" step="0.05"></label>
       <label>Text size <input id="optFont" type="range" min="0.8" max="1.6" step="0.05"></label>
-      <label>Script
-        <select id="optScript">
-          <option value="ta">தமிழ்</option>
-          <option value="lat">Latin (transliteration)</option>
-          <option value="both">Both</option>
-        </select>
-      </label>
       <label>Timing offset <span class="row"><button id="offMinus" class="pill-btn">−0.5s</button><span id="offVal">0.0s</span><button id="offPlus" class="pill-btn">+0.5s</button></span></label>
       <label class="check"><input id="optLoop" type="checkbox"> Loop the recitation</label>
       <label class="check"><input id="optVideo" type="checkbox"> Show video</label>
@@ -77,7 +69,6 @@
   </div>
 
   <script src="lyrics.js"></script>
-  <script src="translit.js"></script>
   <script src="player.js"></script>
   <script src="app.js"></script>
   <script src="https://www.youtube.com/iframe_api" async></script>
