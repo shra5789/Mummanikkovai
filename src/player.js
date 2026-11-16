@@ -3,13 +3,21 @@
 //  * ClockPlayer   — fallback stopwatch if YouTube can't be embedded/reached; the user presses
 //                    play at the same moment they start the video elsewhere.
 // Both expose: time(), duration(), playing(), play(), pause(), seek(sec), and fire onState().
+// Set `loop = true` to restart from 0:00 automatically when the recording ends.
 
 class ClockPlayer {
   constructor(duration) {
     this.kind = 'clock';
-    this._dur = duration; this._base = 0; this._startedAt = null; this.onState = () => {};
+    this._dur = duration; this._base = 0; this._startedAt = null; this.onState = () => {}; this.loop = true;
   }
-  time() { const t = this._startedAt == null ? this._base : this._base + (performance.now() - this._startedAt) / 1000; return Math.min(t, this._dur); }
+  time() {
+    let t = this._startedAt == null ? this._base : this._base + (performance.now() - this._startedAt) / 1000;
+    if (this.loop && this._startedAt != null && t >= this._dur) {
+      this._base = 0; this._startedAt = performance.now(); t = 0;
+      this.onLoop && this.onLoop();
+    }
+    return Math.min(t, this._dur);
+  }
   duration() { return this._dur; }
   playing() { return this._startedAt != null && this.time() < this._dur; }
   play() { if (this._startedAt == null) { this._startedAt = performance.now(); this.onState(); } }
@@ -20,7 +28,7 @@ class ClockPlayer {
 class YouTubePlayer {
   constructor(elementId, videoId, duration, { onReady, onError }) {
     this.kind = 'youtube';
-    this._dur = duration; this._ready = false; this.onState = () => {};
+    this._dur = duration; this._ready = false; this.onState = () => {}; this.loop = true;
     // getCurrentTime() only updates every ~100-250 ms; interpolate between updates for smooth highlighting
     this._lastT = 0; this._lastAt = performance.now(); this._state = -1;
     this.p = new YT.Player(elementId, {
@@ -29,7 +37,15 @@ class YouTubePlayer {
       playerVars: { autoplay: 0, controls: 1, rel: 0, playsinline: 1, modestbranding: 1, origin: location.origin },
       events: {
         onReady: () => { this._ready = true; const d = this.p.getDuration(); if (d) this._dur = d; onReady && onReady(); },
-        onStateChange: (e) => { this._state = e.data; this._sample(true); this.onState(); },
+        onStateChange: (e) => {
+          if (e.data === YT.PlayerState.ENDED && this.loop) {
+            this.p.seekTo(0, true); this.p.playVideo();
+            this._lastT = 0; this._lastAt = performance.now();
+            this.onLoop && this.onLoop();
+            return;
+          }
+          this._state = e.data; this._sample(true); this.onState();
+        },
         onError: (e) => onError && onError(e.data),
       },
     });

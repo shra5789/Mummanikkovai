@@ -12,7 +12,7 @@
     onCompactChanged: () => {}, onCommand: () => {},
   };
 
-  const S = { opacity: 0.55, font: 1, script: 'ta', offset: 0, video: false, timings: null };
+  const S = { opacity: 0.55, font: 1, script: 'ta', offset: 0, video: false, loop: true, timings: null };
   let times = DEFAULT_TIMES.slice();
   let player = null;
   let active = -2;
@@ -88,6 +88,7 @@
     if (player) {
       const t = player.time();
       const dur = player.duration();
+      if (sync && !player.playing() && t >= dur - 0.5) finishSync(); // recording ended mid-sync
       if (sync) {
         setActive(sync.next - 1);
         lis.forEach((li, k) => li.classList.toggle('target', k === sync.next));
@@ -100,6 +101,7 @@
           lis[i].style.setProperty('--p', (p * 100).toFixed(1) + '%');
         }
       }
+      if (player.playing() !== document.body.classList.contains('playing')) updatePlayButtons();
       $('time').textContent = fmt(t);
       $('duration').textContent = fmt(dur);
       $('progressFill').style.width = (100 * t / dur).toFixed(2) + '%';
@@ -131,6 +133,7 @@
     $('syncBanner').classList.remove('hidden');
     lis.forEach((li) => li.classList.remove('active', 'past'));
     active = -2;
+    player.loop = false;
     player.seek(0); player.play();
     userScrollUntil = 0;
   }
@@ -166,6 +169,7 @@
     $('syncBanner').classList.add('hidden');
     lis.forEach((li) => li.classList.remove('target'));
     active = -2;
+    player.loop = !!S.loop;
     updateTimingNote();
   }
 
@@ -177,6 +181,7 @@
     document.body.classList.toggle('show-video', !!S.video);
     $('btnScript').textContent = S.script === 'ta' ? 'அ' : S.script === 'lat' ? 'A' : 'அA';
     $('offVal').textContent = (S.offset >= 0 ? '+' : '') + S.offset.toFixed(1) + 's';
+    if (player) player.loop = !!S.loop && !sync;
     active = -2; // refresh pill text
   }
   function updateTimingNote() {
@@ -185,7 +190,7 @@
       : 'Timings are estimates. Use “Sync timings” once — tap Space as each line begins — to make them exact.';
   }
   function openSheet() {
-    $('optOpacity').value = S.opacity; $('optFont').value = S.font; $('optScript').value = S.script; $('optVideo').checked = !!S.video;
+    $('optOpacity').value = S.opacity; $('optFont').value = S.font; $('optScript').value = S.script; $('optVideo').checked = !!S.video; $('optLoop').checked = !!S.loop;
     updateTimingNote();
     $('sheet').classList.remove('hidden');
   }
@@ -211,6 +216,7 @@
     $('optFont').oninput = (e) => { save({ font: +e.target.value }); applyLook(); };
     $('optScript').onchange = (e) => { save({ script: e.target.value }); applyLook(); };
     $('optVideo').onchange = (e) => { save({ video: e.target.checked }); applyLook(); };
+    $('optLoop').onchange = (e) => { save({ loop: e.target.checked }); applyLook(); };
     $('offMinus').onclick = () => { save({ offset: Math.round((S.offset - 0.5) * 10) / 10 }); applyLook(); };
     $('offPlus').onclick = () => { save({ offset: Math.round((S.offset + 0.5) * 10) / 10 }); applyLook(); };
     $('btnSync').onclick = startSync;
@@ -249,10 +255,11 @@
   }
 
   // ---------- player ----------
+  function onLoop() { active = -2; userScrollUntil = 0; }
   function useClock(reason) {
     if (player && player.kind === 'clock') return;
     player = new ClockPlayer(L.duration);
-    player.onState = updatePlayButtons;
+    player.onState = updatePlayButtons; player.onLoop = onLoop; player.loop = !!S.loop;
     document.body.classList.add('clock-mode');
     toast(reason + ' Using a stopwatch instead: press ▶ at the same moment you start the video.', 9000);
   }
@@ -260,7 +267,7 @@
   window.onYouTubeIframeAPIReady = () => {
     if (player) return;
     const yp = new YouTubePlayer('yt', L.videoId, L.duration, {
-      onReady: () => { clearTimeout(ytTimeout); player = yp; yp.onState = updatePlayButtons; },
+      onReady: () => { clearTimeout(ytTimeout); player = yp; yp.onState = updatePlayButtons; yp.onLoop = onLoop; yp.loop = !!S.loop && !sync; },
       onError: (code) => {
         clearTimeout(ytTimeout);
         if (!player || player === yp) { player = null; useClock(`YouTube can’t play the video here (error ${code}).`); }
