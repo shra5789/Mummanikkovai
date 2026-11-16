@@ -1,0 +1,28 @@
+{
+  "name": "mummanikkovai-widget",
+  "productName": "Mummanikkovai Lyrics",
+  "version": "1.0.0",
+  "description": "A small transparent always-on-top lyrics widget for Swami Desikan's Mummanikkovai, synced to the recitation on YouTube.",
+  "main": "main.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable nsis",
+    "dist:dir": "electron-builder --win dir"
+  },
+  "devDependencies": {
+    "electron": "44.9.3",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "com.mummanikkovai.widget",
+    "productName": "Mummanikkovai Lyrics",
+    "files": ["main.js", "preload.js", "src/**/*", "assets/**/*"],
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": ["portable", "nsis"]
+    },
+    "portable": { "artifactName": "MummanikkovaiLyrics-portable.exe" },
+    "nsis": { "artifactName": "MummanikkovaiLyrics-setup.exe", "oneClick": true }
+  }
+}

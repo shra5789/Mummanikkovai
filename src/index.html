@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ta">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' https://www.youtube.com https://s.ytimg.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com; img-src 'self' https://i.ytimg.com data:; style-src 'self' 'unsafe-inline'">
+  <title>Mummanikkovai</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="panel" class="panel">
+
+    <!-- full widget -->
+    <header class="bar drag">
+      <div class="titles">
+        <span class="title">மும்மணிக்கோவை</span>
+        <span id="verseLabel" class="verse-label"></span>
+      </div>
+      <div class="buttons nodrag">
+        <button id="btnScript" class="icon" title="Tamil / Latin / both (T)">அ</button>
+        <button id="btnSettings" class="icon" title="Settings">⚙</button>
+        <button id="btnMin" class="icon" title="Minimize (M)">–</button>
+        <button id="btnClose" class="icon" title="Hide to tray (Ctrl+Alt+L brings it back)">×</button>
+      </div>
+    </header>
+
+    <div id="syncBanner" class="sync-banner hidden">
+      <span><b>Sync:</b> press <kbd>Space</kbd> as each highlighted line <i>starts</i> · <kbd>⌫</kbd> undo · <kbd>Esc</kbd> finish</span>
+      <button id="btnMark" class="pill-btn nodrag">Mark</button>
+    </div>
+
+    <main id="viewport" class="viewport nodrag">
+      <ol id="lines" class="lines"></ol>
+    </main>
+
+    <footer class="controls nodrag">
+      <button id="btnPrev" class="icon" title="Previous line (↑)">⏮</button>
+      <button id="btnPlay" class="icon play" title="Play / pause (Space)">▶</button>
+      <button id="btnNext" class="icon" title="Next line (↓)">⏭</button>
+      <span id="time" class="time">0:00</span>
+      <div id="progress" class="progress"><div id="progressFill" class="fill"></div></div>
+      <span id="duration" class="time">6:56</span>
+    </footer>
+
+    <!-- minimized pill -->
+    <div class="pill drag">
+      <button id="pillPlay" class="icon nodrag" title="Play / pause">▶</button>
+      <div id="pillText" class="pill-text"></div>
+      <button id="btnRestore" class="icon nodrag" title="Expand">⤢</button>
+    </div>
+
+    <!-- settings sheet -->
+    <section id="sheet" class="sheet hidden nodrag">
+      <div class="sheet-head"><b>Settings</b><button id="btnSheetClose" class="icon">×</button></div>
+      <label>Background <input id="optOpacity" type="range" min="0" max="0.95" step="0.05"></label>
+      <label>Text size <input id="optFont" type="range" min="0.8" max="1.6" step="0.05"></label>
+      <label>Script
+        <select id="optScript">
+          <option value="ta">தமிழ்</option>
+          <option value="lat">Latin (transliteration)</option>
+          <option value="both">Both</option>
+        </select>
+      </label>
+      <label>Timing offset <span class="row"><button id="offMinus" class="pill-btn">−0.5s</button><span id="offVal">0.0s</span><button id="offPlus" class="pill-btn">+0.5s</button></span></label>
+      <label class="check"><input id="optVideo" type="checkbox"> Show video</label>
+      <div class="row wrap">
+        <button id="btnSync" class="pill-btn accent">Sync timings…</button>
+        <button id="btnReset" class="pill-btn">Reset timings</button>
+        <button id="btnQuit" class="pill-btn">Quit</button>
+      </div>
+      <p id="timingNote" class="note"></p>
+    </section>
+
+    <div id="toast" class="toast hidden"></div>
+    <div id="videoBox" class="video-box"><div id="yt"></div></div>
+  </div>
+
+  <script src="lyrics.js"></script>
+  <script src="translit.js"></script>
+  <script src="player.js"></script>
+  <script src="app.js"></script>
+  <script src="https://www.youtube.com/iframe_api" async></script>
+</body>
+</html>
