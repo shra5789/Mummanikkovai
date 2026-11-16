@@ -1,8 +1,8 @@
 {
-  "name": "mummanikkovai-widget",
-  "productName": "Mummanikkovai Lyrics",
+  "name": "slokam-player",
+  "productName": "Slokam Player",
   "version": "1.0.0",
-  "description": "A small transparent always-on-top lyrics widget for Swami Desikan's Mummanikkovai, synced to the recitation on YouTube.",
+  "description": "A small transparent always-on-top widget that plays slokam recitations with synced lyrics. Starts with Swami Desikan's Mummanikkovai.",
   "main": "main.js",
   "license": "MIT",
   "scripts": {
@@ -15,14 +15,14 @@
     "electron-builder": "26.18.0"
   },
   "build": {
-    "appId": "com.mummanikkovai.widget",
-    "productName": "Mummanikkovai Lyrics",
+    "appId": "com.slokamplayer.app",
+    "productName": "Slokam Player",
     "files": ["main.js", "preload.js", "src/**/*", "assets/**/*"],
     "win": {
       "icon": "assets/icon.ico",
       "target": ["portable", "nsis"]
     },
-    "portable": { "artifactName": "MummanikkovaiLyrics-portable.exe" },
-    "nsis": { "artifactName": "MummanikkovaiLyrics-setup.exe", "oneClick": true }
+    "portable": { "artifactName": "SlokamPlayer-portable.exe" },
+    "nsis": { "artifactName": "SlokamPlayer-setup.exe", "oneClick": true }
   }
 }

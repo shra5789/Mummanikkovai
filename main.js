@@ -1,4 +1,4 @@
-// Mummanikkovai lyrics widget — Electron main process.
+// Slokam Player — Electron main process.
 // A small, frameless, transparent, always-on-top window that plays the
 // recording through YouTube's embedded player and shows the lyrics in sync.
 
@@ -79,7 +79,7 @@ function createWindow(port) {
     resizable: true,
     alwaysOnTop: true,
     skipTaskbar: false,
-    title: 'Mummanikkovai',
+    title: 'Slokam Player',
     icon: ICON,
     show: false,
     webPreferences: {
@@ -168,7 +168,7 @@ function rebuildTrayMenu() {
 function createTray() {
   const img = nativeImage.createFromPath(path.join(__dirname, 'assets', 'icon.png')).resize({ width: 16, height: 16 });
   tray = new Tray(img);
-  tray.setToolTip('Mummanikkovai lyrics  (Ctrl+Alt+L)');
+  tray.setToolTip('Slokam Player  (Ctrl+Alt+L)');
   tray.on('click', toggleVisible);
   rebuildTrayMenu();
 }
@@ -186,7 +186,7 @@ if (!app.requestSingleInstanceLock()) {
 } else {
   app.on('second-instance', () => { if (win) { win.show(); setCompact(false); } });
   app.whenReady().then(async () => {
-    if (process.platform === 'win32') app.setAppUserModelId('com.mummanikkovai.widget');
+    if (process.platform === 'win32') app.setAppUserModelId('com.slokamplayer.app');
     loadSettings();
     const port = await startServer();
     createWindow(port);

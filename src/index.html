@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self'; script-src 'self' https://www.youtube.com https://s.ytimg.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com; img-src 'self' https://i.ytimg.com data:; style-src 'self' 'unsafe-inline'">
-  <title>Mummanikkovai</title>
+  <title>Slokam Player</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,8 +13,11 @@
     <!-- full widget -->
     <header class="bar drag">
       <div class="titles">
-        <span class="title">மும்மணிக்கோவை</span>
-        <span id="verseLabel" class="verse-label"></span>
+        <div class="app-name">Slokam Player</div>
+        <div class="now">
+          <span id="slokaTitle" class="title">மும்மணிக்கோவை</span>
+          <span id="verseLabel" class="verse-label"></span>
+        </div>
       </div>
       <div class="buttons nodrag">
         <button id="btnSettings" class="icon" title="Settings">⚙</button>

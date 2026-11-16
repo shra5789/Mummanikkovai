@@ -1,6 +1,9 @@
-# Mummanikkovai Lyrics: a floating lyrics widget for Windows
+# Slokam Player
 
-A small, transparent, always-on-top widget that plays
+A floating lyrics widget for Windows that plays slokam recitations with the words in sync.
+The first slokam it includes is Swami Desikan's Mummanikkovai.
+
+It's a small, transparent, always-on-top widget that plays
 [the Mummanikkovai recitation](https://youtu.be/_S8ixInldNY)
 (Thiruvayindhai K. Malolakannan & N. S. Ranganathan) and shows
 Swami Desikan's **மும்மணிக்கோவை** line by line as it is recited, scrolling the way Spotify's lyrics view does.
@@ -14,11 +17,11 @@ Swami Desikan's **மும்மணிக்கோவை** line by line as it i
 
 ## Get it
 
-**Download a build:** open this repo's *Actions* tab, choose the latest **Build Windows widget**
-run, and download the `MummanikkovaiLyrics-windows` artifact. It contains
+**Download a build:** open this repo's *Actions* tab, choose the latest **Build Slokam Player (Windows)**
+run, and download the `SlokamPlayer-windows` artifact. It contains
 
-- `MummanikkovaiLyrics-portable.exe`, which runs without installing
-- `MummanikkovaiLyrics-setup.exe`, which installs it with a Start-menu entry
+- `SlokamPlayer-portable.exe`, which runs without installing
+- `SlokamPlayer-setup.exe`, which installs it with a Start-menu entry
 
 Windows SmartScreen may warn you because the app isn't code-signed. Click *More info → Run anyway*.
 
@@ -58,7 +61,7 @@ If everything is consistently a bit early or late, use **Timing offset** (±0.5 
 ## How it works
 
 - `main.js` (Electron) creates the frameless, transparent, always-on-top window plus the tray icon, and stores
-  settings in `%APPDATA%\Mummanikkovai Lyrics\settings.json`. It serves `src/` from `127.0.0.1` because
+  settings in `%APPDATA%\Slokam Player\settings.json`. It serves `src/` from `127.0.0.1` because
   YouTube's embedded player won't run from a `file://` page.
 - `src/player.js` drives YouTube's embedded player, which gives the exact playback position. If YouTube can't
   be reached or refuses the embed, the widget falls back to a stopwatch: press ▶ at the moment you start the video elsewhere.

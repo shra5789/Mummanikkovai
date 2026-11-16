@@ -1,4 +1,4 @@
-/* Mummanikkovai lyrics widget — renderer */
+/* Slokam Player — renderer */
 (function () {
   const $ = (id) => document.getElementById(id);
   const L = window.LYRICS;

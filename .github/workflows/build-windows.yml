@@ -1,4 +1,4 @@
-name: Build Windows widget
+name: Build Slokam Player (Windows)
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
       - uses: actions/upload-artifact@v4
         with:
-          name: MummanikkovaiLyrics-windows
+          name: SlokamPlayer-windows
           path: |
-            dist/MummanikkovaiLyrics-portable.exe
-            dist/MummanikkovaiLyrics-setup.exe
+            dist/SlokamPlayer-portable.exe
+            dist/SlokamPlayer-setup.exe
