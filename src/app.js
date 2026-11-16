@@ -28,8 +28,6 @@
     return ans;
   }
   function verseName(v) {
-    if (v === 0) return 'தனியன்';
-    if (v === 99) return 'வாழி';
     return `பாசுரம் ${v} / 10`;
   }
   let toastTimer;
@@ -48,9 +46,12 @@
       li.className = 'line';
       if (i === 0 || L.lines[i - 1].v !== ln.v) {
         li.classList.add('verse-start');
-        li.dataset.verse = ln.v === 0 ? 'தனியன்' : ln.v === 99 ? 'வாழி' : ln.v;
+        li.dataset.verse = ln.v;
       }
-      li.textContent = ln.text;
+      // inline span: when a line wraps, its background is laid out as one continuous strip,
+      // so the highlight sweeps the first row and then the second instead of both at once
+      const txt = document.createElement('span'); txt.className = 'txt'; txt.textContent = ln.text;
+      li.appendChild(txt);
       li.addEventListener('click', () => {
         if (sync) return;
         player.seek(t0(i) + 0.01); player.play(); userScrollUntil = 0;
@@ -63,7 +64,8 @@
     const vp = $('viewport');
     const li = lis[Math.max(active, 0)];
     if (!li) return;
-    const top = li.offsetTop - vp.clientHeight * 0.36 + li.offsetHeight / 2;
+    // keep the whole active line (even when it wraps) clear of the faded top edge
+    const top = li.offsetTop - Math.max(vp.clientHeight * 0.24, 30);
     vp.scrollTo({ top, behavior: smooth ? 'smooth' : 'auto' });
   }
 
@@ -96,7 +98,7 @@
         if (i >= 0) {
           const end = i + 1 < times.length ? t0(i + 1) : Math.min(t0(i) + 6, dur);
           const p = Math.max(0, Math.min(1, (t - t0(i)) / Math.max(0.3, end - t0(i))));
-          lis[i].style.setProperty('--p', (p * 100).toFixed(1) + '%');
+          lis[i].style.setProperty('--p', (p * 100).toFixed(2) + '%');
         }
       }
       if (player.playing() !== document.body.classList.contains('playing')) updatePlayButtons();
