@@ -6,7 +6,7 @@ A small, transparent, always-on-top widget that plays
 Swami Desikan's **மும்மணிக்கோவை** line by line as it is recited, scrolling the way Spotify's lyrics view does.
 
 - **Floats above other windows** and stays put. It's frameless and see-through, and you can drag it anywhere by its title bar.
-- **Spotify-style lyrics:** the current line is highlighted with a gold-to-white sweep, past lines dim, and clicking any line jumps the recitation there.
+- **Spotify-style lyrics:** the current line fills in with a white sweep (row by row when it wraps), past lines dim, and clicking any line jumps the recitation there.
 - **Minimize** (`–` or `M`) shrinks it to a slim pill that shows only the current line. Click `⤢` to expand it again.
 - **×** hides it to the system tray. Bring it back from the tray icon or with **Ctrl + Alt + L**.
 - **Loops** the recitation and starts again from the first pāsuram when it ends. You can turn this off in ⚙.
