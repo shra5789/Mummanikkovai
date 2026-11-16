@@ -48,6 +48,7 @@ body.playing:not(:hover) .controls { opacity: 0; }
 
 /* ---------- lyrics ---------- */
 .viewport {
+  position: relative; /* make line offsetTop relative to the scroll area, not the panel */
   flex: 1; overflow-y: auto; scrollbar-width: none; padding: 0 16px;
   -webkit-mask-image: linear-gradient(transparent 0, #000 16%, #000 80%, transparent 100%);
           mask-image: linear-gradient(transparent 0, #000 16%, #000 80%, transparent 100%);
@@ -98,7 +99,8 @@ body.playing:not(:hover) .controls { opacity: 0; }
   display: flex; align-items: center; gap: 8px; margin: 4px 10px 0; padding: 6px 8px 6px 10px;
   border-radius: 10px; font-size: 11px; background: rgba(240, 179, 90, .18); border: 1px solid rgba(240, 179, 90, .45);
 }
-.sync-banner span { flex: 1; }
+.sync-banner > span { flex: 1; }
+.sync-next { display: block; margin-top: 2px; font-family: var(--tamil); color: var(--accent); }
 kbd { font: inherit; font-size: 10px; padding: 0 4px; border-radius: 4px; background: rgba(var(--fg), .15); }
 .line.target { color: #fff; background: rgba(240, 179, 90, .22); outline: 1px dashed rgba(240,179,90,.7); }
 

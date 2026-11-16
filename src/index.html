@@ -27,7 +27,10 @@
     </header>
 
     <div id="syncBanner" class="sync-banner hidden">
-      <span><b>Sync:</b> press <kbd>Space</kbd> as each highlighted line <i>starts</i> · <kbd>⌫</kbd> undo · <kbd>Esc</kbd> finish</span>
+      <span title="Space: mark the highlighted line as it starts · S: skip it if the recording doesn't say it here · Backspace: undo · Esc: finish">
+        <b>Sync</b> <kbd>Space</kbd> line starts · <kbd>S</kbd> skip · <kbd>⌫</kbd> undo · <kbd>Esc</kbd> done
+        <span id="syncNext" class="sync-next"></span></span>
+      <button id="btnSkip" class="pill-btn nodrag" title="This line isn't recited here (S)">Skip</button>
       <button id="btnMark" class="pill-btn nodrag">Mark</button>
     </div>
 

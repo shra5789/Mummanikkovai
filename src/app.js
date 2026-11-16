@@ -2,7 +2,12 @@
 (function () {
   const $ = (id) => document.getElementById(id);
   const L = window.LYRICS;
-  const DEFAULT_TIMES = L.lines.map((l) => l.t);
+
+  // Playback follows a *timeline*: every recited line in the order the recording says it,
+  // so repeated pāsurams appear more than once. seq[e] is the line shown for timeline entry e,
+  // times[e] is when that entry starts.
+  const DEFAULT_SEQ = L.timeline.map((x) => x[0]);
+  const DEFAULT_TIMES = L.timeline.map((x) => x[1]);
 
   // settings live in the Electron main process; fall back to localStorage when opened in a plain browser
   const store = window.widget || {
@@ -12,23 +17,28 @@
     onCompactChanged: () => {}, onCommand: () => {},
   };
 
-  const S = { opacity: 0.55, font: 1, offset: 0, video: false, loop: true, timings: null };
+  const S = { opacity: 0.55, font: 1, offset: 0, video: false, loop: true, timings: null, seq: null };
+  let seq = DEFAULT_SEQ.slice();
   let times = DEFAULT_TIMES.slice();
   let player = null;
-  let active = -2;
+  let entry = -2;       // current timeline entry
+  let activeLine = -2;  // line currently highlighted
   let userScrollUntil = 0;
-  let sync = null; // { next: index, marks: [] } while in sync mode
+  let sync = null;      // { next, marks: [time | null (skipped)] } while in sync mode
 
   // ---------- helpers ----------
   const fmt = (s) => { s = Math.max(0, Math.floor(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
-  const t0 = (i) => times[i] + S.offset;
-  function lineAt(t) {
+  const t0 = (e) => times[e] + S.offset;
+  function entryAt(t) {
     let lo = 0, hi = times.length - 1, ans = -1;
     while (lo <= hi) { const m = (lo + hi) >> 1; if (t0(m) <= t) { ans = m; lo = m + 1; } else hi = m - 1; }
     return ans;
   }
-  function verseName(v) {
-    return `பாசுரம் ${v} / 10`;
+  // true if timeline entry e is a repeat of a line already recited earlier
+  const isRepeat = (e, s = seq) => s.slice(0, e).includes(s[e]);
+  function label(e) {
+    if (e < 0 || e >= seq.length) return '';
+    return `பாசுரம் ${L.lines[seq[e]].v} / 10` + (isRepeat(e) ? ' · மீண்டும்' : '');
   }
   let toastTimer;
   function toast(msg, ms = 3500) {
@@ -53,34 +63,44 @@
       const txt = document.createElement('span'); txt.className = 'txt'; txt.textContent = ln.text;
       li.appendChild(txt);
       li.addEventListener('click', () => {
-        if (sync) return;
-        player.seek(t0(i) + 0.01); player.play(); userScrollUntil = 0;
+        if (sync || !player) return;
+        // a repeated line has several timeline entries: jump to the one nearest the current position
+        const now = player.time();
+        let best = -1;
+        seq.forEach((l, e) => { if (l === i && (best < 0 || Math.abs(t0(e) - now) < Math.abs(t0(best) - now))) best = e; });
+        if (best >= 0) { player.seek(t0(best) + 0.01); player.play(); userScrollUntil = 0; }
       });
       ol.appendChild(li); lis.push(li);
     });
   }
 
-  function scrollToActive(smooth) {
+  function scrollToLine(line, smooth) {
     const vp = $('viewport');
-    const li = lis[Math.max(active, 0)];
+    const li = lis[Math.max(line, 0)];
     if (!li) return;
-    // keep the whole active line (even when it wraps) clear of the faded top edge
+    // keep the whole line (even when it wraps) clear of the faded top edge
     const top = li.offsetTop - Math.max(vp.clientHeight * 0.24, 30);
     vp.scrollTo({ top, behavior: smooth ? 'smooth' : 'auto' });
   }
 
-  function setActive(i) {
-    if (i === active) return;
-    const prev = active;
-    active = i;
+  // highlight timeline entry e; `scrollLine` overrides which line to keep in view (used by sync mode)
+  function setEntry(e, scrollLine) {
+    if (e === entry && scrollLine === undefined) return;
+    const changed = e !== entry;
+    entry = e;
+    const line = e < 0 ? -1 : seq[e];
+    const prevLine = activeLine;
+    activeLine = line;
     lis.forEach((li, k) => {
-      li.classList.toggle('active', k === i);
-      li.classList.toggle('past', k < i);
+      li.classList.toggle('active', k === line);
+      li.classList.toggle('past', k < line); // on a repeat, lines after it light back up as "to come"
     });
-    const ln = L.lines[Math.max(i, 0)];
-    $('verseLabel').textContent = i < 0 ? '' : verseName(ln.v);
-    $('pillText').textContent = i < 0 ? L.title : ln.text;
-    if (performance.now() > userScrollUntil) scrollToActive(Math.abs(i - prev) < 4);
+    $('verseLabel').textContent = label(e);
+    $('pillText').textContent = line < 0 ? L.title : L.lines[line].text;
+    if (changed && performance.now() > userScrollUntil) {
+      const target = scrollLine ?? line;
+      scrollToLine(target, Math.abs(target - prevLine) < 14);
+    }
   }
 
   // ---------- main loop ----------
@@ -90,15 +110,21 @@
       const dur = player.duration();
       if (sync && !player.playing() && t >= dur - 0.5) finishSync(); // recording ended mid-sync
       if (sync) {
-        setActive(sync.next - 1);
-        lis.forEach((li, k) => li.classList.toggle('target', k === sync.next));
+        const targetLine = seq[sync.next];
+        if (sync.shown !== sync.next) {
+          sync.shown = sync.next;
+          entry = -2; // force refresh
+          setEntry(sync.next - 1, targetLine ?? undefined);
+          lis.forEach((li, k) => li.classList.toggle('target', k === targetLine));
+          $('syncNext').textContent = sync.next < seq.length ? 'Next: ' + label(sync.next) : '';
+        }
       } else {
-        const i = lineAt(t);
-        setActive(i);
-        if (i >= 0) {
-          const end = i + 1 < times.length ? t0(i + 1) : Math.min(t0(i) + 6, dur);
-          const p = Math.max(0, Math.min(1, (t - t0(i)) / Math.max(0.3, end - t0(i))));
-          lis[i].style.setProperty('--p', (p * 100).toFixed(2) + '%');
+        const e = entryAt(t);
+        setEntry(e);
+        if (e >= 0) {
+          const end = e + 1 < times.length ? t0(e + 1) : Math.min(t0(e) + 6, dur);
+          const p = Math.max(0, Math.min(1, (t - t0(e)) / Math.max(0.3, end - t0(e))));
+          lis[seq[e]].style.setProperty('--p', (p * 100).toFixed(2) + '%');
         }
       }
       if (player.playing() !== document.body.classList.contains('playing')) updatePlayButtons();
@@ -118,57 +144,77 @@
   function togglePlay() { if (!player) return; player.playing() ? player.pause() : player.play(); setTimeout(updatePlayButtons, 50); }
   function jumpLine(d) {
     if (!player) return;
-    const base = active < 0 ? -1 : active;
+    const base = entry < 0 ? -1 : entry;
     const target = Math.max(0, Math.min(times.length - 1, base + d));
     // "previous" restarts the current line if we're more than 2s into it
-    const i = d < 0 && active >= 0 && player.time() - t0(active) > 2 ? active : target;
-    player.seek(t0(i) + 0.01); userScrollUntil = 0;
+    const e = d < 0 && entry >= 0 && player.time() - t0(entry) > 2 ? entry : target;
+    player.seek(t0(e) + 0.01); userScrollUntil = 0;
+    setEntry(e); // update now so quick repeated presses keep stepping
   }
 
   // ---------- sync mode ----------
+  // Walks the timeline in playback order (repeats included). Space marks the start of the
+  // highlighted line; S skips it if the recording doesn't actually say it there.
   function startSync() {
     closeSheet();
-    sync = { next: 0, marks: [] };
+    sync = { next: 0, marks: [], shown: -1 };
     document.body.classList.add('syncing');
     $('syncBanner').classList.remove('hidden');
-    lis.forEach((li) => li.classList.remove('active', 'past'));
-    active = -2;
     player.loop = false;
     player.seek(0); player.play();
     userScrollUntil = 0;
   }
+  function lastMark() {
+    for (let k = sync.marks.length - 1; k >= 0; k--) if (sync.marks[k] != null) return sync.marks[k];
+    return null;
+  }
   function mark() {
     if (!sync) return;
-    const prev = sync.marks[sync.next - 1];
+    const prev = lastMark();
     sync.marks[sync.next] = prev == null ? player.time() : Math.max(player.time(), prev + 0.1);
     sync.next++;
-    if (sync.next >= times.length) finishSync();
+    if (sync.next >= seq.length) finishSync();
+  }
+  function skip() {
+    if (!sync) return;
+    sync.marks[sync.next] = null;
+    sync.next++;
+    if (sync.next >= seq.length) finishSync();
   }
   function undoMark() {
     if (!sync || sync.next === 0) return;
+    const wasMark = sync.marks[sync.next - 1] != null;
     sync.next--; sync.marks.length = sync.next;
     // replay from the start of the last kept line so the redone mark lands after it
-    player.seek(sync.marks[sync.next - 1] ?? 0);
+    if (wasMark) player.seek(lastMark() ?? 0);
   }
   function finishSync() {
     if (!sync) return;
     const n = sync.marks.length;
+    const total = seq.length;
+    const skipped = sync.marks.filter((m) => m == null).length;
     if (n > 0) {
-      const newTimes = times.map((t) => t + S.offset);
-      for (let k = 0; k < n; k++) newTimes[k] = sync.marks[k];
-      // shift the not-yet-marked lines so they keep their relative spacing
-      const delta = sync.marks[n - 1] - (times[n - 1] + S.offset);
-      for (let k = n; k < newTimes.length; k++) newTimes[k] += delta;
+      const newSeq = [], newTimes = [];
+      let delta = 0;
+      for (let k = 0; k < n; k++) {
+        if (sync.marks[k] == null) continue; // skipped: not in this recording
+        newSeq.push(seq[k]); newTimes.push(sync.marks[k]);
+        delta = sync.marks[k] - t0(k);
+      }
+      // shift the not-yet-synced lines so they keep their relative spacing
+      for (let k = n; k < seq.length; k++) { newSeq.push(seq[k]); newTimes.push(t0(k) + delta); }
+      seq = newSeq;
       times = newTimes.map((t) => Math.round(t * 100) / 100);
-      save({ timings: times, offset: 0 });
+      save({ timings: times, seq, offset: 0 });
       $('offVal').textContent = '0.0s';
-      toast(n === times.length ? 'Timings saved for every line ✓' : `Saved ${n} of ${times.length} lines — run Sync again later to finish.`);
+      toast((n === total ? 'Timings saved for every line ✓' : `Saved ${n} of ${total} lines — run Sync again later to finish.`)
+        + (skipped ? ` Skipped ${skipped} line${skipped > 1 ? 's' : ''} not in the recording.` : ''));
     }
     sync = null;
     document.body.classList.remove('syncing');
     $('syncBanner').classList.add('hidden');
     lis.forEach((li) => li.classList.remove('target'));
-    active = -2;
+    entry = -2;
     player.loop = !!S.loop;
     updateTimingNote();
   }
@@ -180,7 +226,7 @@
     document.body.classList.toggle('show-video', !!S.video);
     $('offVal').textContent = (S.offset >= 0 ? '+' : '') + S.offset.toFixed(1) + 's';
     if (player) player.loop = !!S.loop && !sync;
-    active = -2; // refresh pill text
+    entry = -2; // refresh pill text
   }
   function updateTimingNote() {
     $('timingNote').textContent = S.timings
@@ -196,7 +242,7 @@
 
   function applyCompact(on) {
     document.body.classList.toggle('compact', on);
-    if (!on) { active = -2; setTimeout(() => scrollToActive(false), 30); }
+    if (!on) { entry = -2; activeLine = -2; } // next frame re-highlights and scrolls to the current line
   }
 
   // ---------- wire up ----------
@@ -217,7 +263,12 @@
     $('offPlus').onclick = () => { save({ offset: Math.round((S.offset + 0.5) * 10) / 10 }); applyLook(); };
     $('btnSync').onclick = startSync;
     $('btnMark').onclick = mark;
-    $('btnReset').onclick = () => { times = DEFAULT_TIMES.slice(); save({ timings: null, offset: 0 }); applyLook(); updateTimingNote(); toast('Timings reset to the built-in estimates.'); };
+    $('btnSkip').onclick = skip;
+    $('btnReset').onclick = () => {
+      seq = DEFAULT_SEQ.slice(); times = DEFAULT_TIMES.slice();
+      save({ timings: null, seq: null, offset: 0 }); applyLook(); updateTimingNote();
+      toast('Timings reset to the built-in estimates.');
+    };
     $('btnQuit').onclick = () => store.quit();
 
     $('progress').addEventListener('click', (e) => {
@@ -231,6 +282,7 @@
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
       if (sync) {
         if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); mark(); }
+        else if (e.code === 'KeyS') { e.preventDefault(); skip(); }
         else if (e.code === 'Backspace') { e.preventDefault(); undoMark(); }
         else if (e.code === 'Escape') finishSync();
         return;
@@ -250,7 +302,7 @@
   }
 
   // ---------- player ----------
-  function onLoop() { active = -2; userScrollUntil = 0; }
+  function onLoop() { entry = -2; userScrollUntil = 0; }
   function useClock(reason) {
     if (player && player.kind === 'clock') return;
     player = new ClockPlayer(L.duration);
@@ -273,12 +325,13 @@
   // ---------- start ----------
   (async () => {
     Object.assign(S, await store.getSettings());
-    if (Array.isArray(S.timings) && S.timings.length === DEFAULT_TIMES.length) times = S.timings.slice();
-    else S.timings = null;
+    const ok = Array.isArray(S.timings) && Array.isArray(S.seq) && S.timings.length === S.seq.length && S.seq.length > 0
+      && S.seq.every((i) => Number.isInteger(i) && i >= 0 && i < L.lines.length);
+    if (ok) { seq = S.seq.slice(); times = S.timings.slice(); } else { S.timings = null; S.seq = null; }
     buildLines();
     bind();
     applyLook();
-    setActive(-1);
+    setEntry(-1);
     requestAnimationFrame(tick);
   })();
 })();
