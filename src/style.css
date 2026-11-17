@@ -1,10 +1,17 @@
+/* Noto Sans Devanagari (SIL OFL, src/fonts/) is bundled for Devanagari because it draws the Vēdic
+   svara marks (॒ ॑ ᳚); Tamil still falls through to Nirmala UI */
+@font-face { font-family: "Slokam Devanagari"; font-weight: 400; src: url("fonts/NotoSansDevanagari-400.woff2") format("woff2");
+  unicode-range: U+0900-097F, U+1CD0-1CFF, U+A8E0-A8FF, U+200C-200D, U+25CC; }
+@font-face { font-family: "Slokam Devanagari"; font-weight: 600 700; src: url("fonts/NotoSansDevanagari-600.woff2") format("woff2");
+  unicode-range: U+0900-097F, U+1CD0-1CFF, U+A8E0-A8FF, U+200C-200D, U+25CC; }
+
 :root {
   --bg-a: 0.55;           /* panel opacity, set from settings */
   --scale: 1;             /* text size, set from settings */
   --fg: 255, 255, 255;
   --accent: #f0b35a;      /* warm lamp-gold */
   /* Nirmala UI (Windows) covers both Tamil and Devanagari */
-  --tamil: "Nirmala UI", "Noto Sans Tamil", "Noto Sans Devanagari", "Latha", "Mangal", "Tamil Sangam MN", sans-serif;
+  --tamil: "Slokam Devanagari", "Nirmala UI", "Noto Sans Tamil", "Noto Sans Devanagari", "Latha", "Mangal", "Tamil Sangam MN", sans-serif;
   --latin: "Segoe UI", system-ui, sans-serif;
 }
 

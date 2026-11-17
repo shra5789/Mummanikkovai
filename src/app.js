@@ -53,7 +53,7 @@
   function label(e) {
     if (e < 0 || e >= seq.length) return '';
     const v = T.lines[seq[e]].v;
-    const name = (T.labels && T.labels[v]) || `${T.verseWord} ${v} / ${T.verseCount}`;
+    const name = (T.labels && T.labels[v]) || `${T.verseWord} ${v} / ${T.verseCount}`.trim();
     return name + (isRepeat(e) ? ' · ' + REPEAT_WORD[item.lang] : '');
   }
   let toastTimer;
@@ -408,8 +408,8 @@
         case 'Space': e.preventDefault(); togglePlay(); break;
         case 'ArrowUp': e.preventDefault(); jumpLine(-1); break;
         case 'ArrowDown': e.preventDefault(); jumpLine(1); break;
-        case 'ArrowLeft': player && player.seek(player.time() - 5); break;
-        case 'ArrowRight': player && player.seek(player.time() + 5); break;
+        case 'ArrowLeft': prevTrack(); break;
+        case 'ArrowRight': nextTrack(); break;
         case 'KeyM': store.setCompact(!document.body.classList.contains('compact')); break;
         case 'KeyF': toggleFullscreen(); break;
         case 'KeyL': $('btnLibrary').click(); break;

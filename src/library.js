@@ -70,7 +70,7 @@ window.SLOKAM_LIBRARY = [
   {
     id: 'vedam', iast: 'vēdam', native: 'वेदम्', lang: 'sa',
     items: [
-      { n: 44, iast: 'puruṣasūktam', native: 'पुरुषसूक्तम्' },
+      { n: 44, iast: 'puruṣasūktam', native: 'पुरुषसूक्तम्', text: 'purushasuktam', youtube: 'ga0cKR93P6w' },
       { n: 45, iast: 'viṣṇusūktam', native: 'विष्णुसूक्तम्' },
       { n: 46, iast: 'nārāyaṇasūktam', native: 'नारायणसूक्तम्' },
       { n: 47, iast: 'śrīsūktam', native: 'श्रीसूक्तम्' },

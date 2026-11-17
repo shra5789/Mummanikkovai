@@ -26,6 +26,7 @@ Available now:
 | 36 | **श्रीस्तुतिः** · śrīstutiḥ | [YouTube](https://youtu.be/YagbUn2fZWw) | with the opening and closing taniyan |
 | 37 | **श्रीभूस्तुतिः** · śrībhūstutiḥ | [YouTube](https://youtu.be/uQf4CMbF0SY) | with the opening and closing taniyan |
 | 38 | **श्रीगोदास्तुतिः** · śrīgōdāstutiḥ | [YouTube](https://youtu.be/KVdQ-VPiSbY) | with the opening and closing taniyan |
+| 44 | **पुरुषसूक्तम्** · puruṣasūktam | [Malola Kannan](https://youtu.be/ga0cKR93P6w) | with the svara marks (॒ ॑ ᳚) |
 
 Taniyans are included wherever prapatti.com prints them. If a recording leaves one out, press **S** for its lines while syncing.
 
@@ -82,6 +83,7 @@ If everything is consistently a bit early or late, use **Timing offset** (±0.5 
 - **Tamil prabandhams:** a verse whose first line starts with **‡** in the prapatti.com text is chanted twice.
   For Mummanikkovai that's pāsurams 1, 9 and 10; for Tirupallāṇḍu 1, 2, 11 and 12.
 - **Sanskrit Dēśika stōtras:** the first and last ślōkas are chanted twice. For Dayāśatakam that's ślōkas 1 and 108.
+- **Vēdam:** nothing is repeated.
 
 The text generators in `tools/` apply these rules when they build each slokam's playback order.
 
@@ -92,8 +94,8 @@ The text generators in `tools/` apply these rules when they build each slokam's 
 | Space | Play / pause (in Sync mode: mark line) |
 | S | In Sync mode: skip a line that isn't recited there |
 | ↑ / ↓ | Previous / next line |
-| ⏮ / ⏭ buttons | Back to the start (press again within 3 s for the previous slokam) / next slokam |
-| ← / → | Back / forward 5 s |
+| ← / ⏮ | Back to the start of the slokam (press again within 3 s for the previous slokam) |
+| → / ⏭ | Next slokam |
 | L | Open the slokam menu |
 | F | Full screen on / off (Esc also leaves full screen) |
 | M | Minimize / expand |
@@ -118,12 +120,15 @@ The text generators in `tools/` apply these rules when they build each slokam's 
     `tools/build_tamil_prabandham.py` builds the file, either for a whole work or for one decade of a
     larger one (`--section 2.7`), optionally with the work's taniyans (`--taniyans`).
     `tools/build_mummanikkovai.py` builds Mummanikkovai, whose taniyan and closing *சீரார் தூப்புல் …* aren't in its recording.
+  - Vēdam: `tools/build_vedam.py` builds a sūktam from the romanised edition, keeping the Taittirīya svara marks
+    (anudātta ॒, svarita ॑, dīrgha svarita ᳚). The app bundles Noto Sans Devanagari (`src/fonts/`, SIL Open Font
+    License) because it draws those marks, which Windows' own Devanagari font may not.
   - Sanskrit: `tools/build_sanskrit_stotra.py` builds a Dēśika stōtra. prapatti.com's Devanagari PDFs use a broken
     font encoding, so the script reads the romanised edition and converts it to Devanagari.
 
 ### Adding a slokam
 
-1. Build `src/texts/<name>.js` with `tools/build_tamil_prabandham.py` or `tools/build_sanskrit_stotra.py`
+1. Build `src/texts/<name>.js` with `tools/build_tamil_prabandham.py`, `tools/build_sanskrit_stotra.py` or `tools/build_vedam.py`
    (or a new script that produces the same shape, applying the repeat rule for its kind).
 2. Add `<script src="texts/<name>.js">` to `src/index.html`.
 3. In `src/library.js`, give the entry `text: '<name>'` and `youtube: '<video id>'`.
