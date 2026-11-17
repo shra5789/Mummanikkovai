@@ -13,9 +13,9 @@ Available now:
 
 | # | Slokam | Recording | Text (prapatti.com) |
 | --- | --- | --- | --- |
-| 1 | **திருப்பல்லாண்டு** · tirupallāṇḍu | [Nityānusandhānam playlist](https://www.youtube.com/playlist?list=PLCG9337skRtYbC7X1UWUuIqFklWipjLoj) | Periyāḻvār Tirumoḻi 1.1, with its taniyans |
+| 1 | **திருப்பல்லாண்டு** · tirupallāṇḍu | [Nityānusandhānam playlist](https://www.youtube.com/playlist?list=PLCG9337skRtYbC7X1UWUuIqFklWipjLoj) | Periyāḻvār Tirumoḻi 1.1, with the five opening taniyans (from the Nālāyira taniyans) and its own three |
 | 2 | **திருப்பள்ளியெழுச்சி** · tiruppaḷḷiyezucci | 〃 | with taniyans |
-| 3 | **திருப்பாவை** · tiruppāvai | 〃 | with taniyans |
+| 3 | **திருப்பாவை** · tiruppāvai | [Malola Kannan & N S Ranganathan](https://youtu.be/tqrJueDJ1II) | with taniyans |
 | 5 | **பூச்சூட்டல்** · pūccūṭṭal | 〃 | Periyāḻvār Tirumoḻi 2.7 |
 | 6 | **காப்பிடல்** · kāppiḍal | 〃 | Periyāḻvār Tirumoḻi 2.8 |
 | 7 | **சென்னியோங்கு** · śenniyōṅgu | 〃 | Periyāḻvār Tirumoḻi 5.4 |

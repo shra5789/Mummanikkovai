@@ -3,6 +3,7 @@
 // pāsurams marked ‡ in the PDF are said twice.
 window.SLOKAM_TEXTS = window.SLOKAM_TEXTS || {};
 window.SLOKAM_TEXTS["tiruppavai"] = {
+  revision: 2,
   verseWord: "பாசுரம்", verseCount: 30, labels: {"-1": "தனியன்", "-2": "தனியன்", "-3": "தனியன்"},
   order: [-1, -2, -3, 1, 1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 16, 17, 18, 18, 19, 20, 21, 22, 23, 23, 24, 24, 25, 26, 27, 27, 28, 28, 29, 29, 30, 30],
   lines: [

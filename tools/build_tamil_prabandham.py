@@ -20,6 +20,11 @@ ap = argparse.ArgumentParser()
 ap.add_argument('text'); ap.add_argument('id')
 ap.add_argument('--section', help='decade number, e.g. 2.7, to take just that decade')
 ap.add_argument('--taniyans', action='store_true', help='with --section: put the work\'s taniyans first')
+ap.add_argument('--extra-taniyans', metavar='TEXT:FIRST-LAST',
+                help='put numbered taniyans from another repaired text first, e.g. '
+                     'naalaayirattaniyangal_vad.txt:1-5 (chanted before the work\'s own taniyans)')
+ap.add_argument('--revision', type=int, default=1,
+                help='bump when the lines change, so the app drops timings synced to the old lines')
 args = ap.parse_args()
 
 raw = [l.strip() for l in open(args.text, encoding='utf-8').read().splitlines()]
@@ -82,6 +87,19 @@ for l in body:
             out.append({'v': verse, 'text': re.sub(r'\s+', ' ', text).strip()})
         verse += 1; buf = []
 
+if args.extra_taniyans:
+    path, rng = args.extra_taniyans.rsplit(':', 1)
+    first_n, last_n = map(int, rng.split('-'))
+    extra, cur = {}, []
+    for l in (x.strip() for x in open(path, encoding='utf-8').read().splitlines()):
+        if not l or JUNK.match(l) or 'தனியன்கள்' in l or 'ஸம்ப்ரதாய' in l:
+            continue
+        cur.append(l)
+        m = VERSE_END.search(l)
+        if m:
+            extra[int(m.group(1))] = [re.sub(r'\s*॥.*$', '', x) for x in cur]; cur = []
+    taniyan_blocks = [extra[k] for k in range(first_n, last_n + 1)] + taniyan_blocks
+
 lines = []
 for n, block in enumerate(taniyan_blocks, 1):
     for l in block:
@@ -99,6 +117,7 @@ print('// v = pāsuram number (negative = taniyan). order: verses in the order t
 print('// pāsurams marked ‡ in the PDF are said twice.')
 print('window.SLOKAM_TEXTS = window.SLOKAM_TEXTS || {};')
 print(f'window.SLOKAM_TEXTS[{json.dumps(args.id)}] = {{')
+print(f'  revision: {args.revision},')
 print(f'  verseWord: "பாசுரம்", verseCount: {len(verses)}, labels: {json.dumps(labels, ensure_ascii=False)},')
 print(f'  order: {json.dumps(order)},')
 print('  lines: [')

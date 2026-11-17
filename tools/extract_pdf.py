@@ -13,6 +13,7 @@ for p in d:
             lines.append(out)
 t = '\n'.join(lines)
 t = re.sub('[¦¥§ȊȉȋȈ]', '\u0bbf', t)  # glyph variants of the ி vowel sign
+t = re.sub('(?<=[\u0b80-\u0bff])d(?=[\u0b80-\u0bff])', 'க்ஷ்', t)  # the க்ஷ் ligature extracts as "d
 C = '[க-ஹ]'
 # pre-base vowel reorder
 t = re.sub('([ெேை])(' + C + ')', r'\2\1', t)

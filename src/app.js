@@ -80,9 +80,18 @@
   }
   const knownDuration = () => (player && player.duration() > 1 ? player.duration() : item.duration || 600);
 
+  // a text's `revision` goes up when its lines change; timings synced to an older revision point
+  // at the wrong lines, so they're dropped
+  const revision = () => T.revision || 1;
   function loadTimings() {
     const m = mine();
-    const ok = Array.isArray(m.timings) && Array.isArray(m.seq) && m.timings.length === m.seq.length && m.seq.length > 0
+    const has = Array.isArray(m.timings) && Array.isArray(m.seq);
+    const stale = has && (m.rev || 1) !== revision();
+    if (stale) {
+      saveMine({ timings: null, seq: null, rev: null });
+      setTimeout(() => toast(`The text of ${item.iast} was updated, so your synced timings for it no longer fit. Please run Sync timings again.`, 9000), 600);
+    }
+    const ok = !stale && has && m.timings.length === m.seq.length && m.seq.length > 0
       && m.seq.every((i) => Number.isInteger(i) && i >= 0 && i < T.lines.length);
     if (ok) { seq = m.seq.slice(); times = m.timings.slice(); estimatedFor = null; }
     else { seq = defaultSeq(); const d = knownDuration(); times = estimate(seq, d); estimatedFor = d; }
@@ -266,7 +275,7 @@
       seq = newSeq;
       times = newTimes.map((t) => Math.round(t * 100) / 100);
       estimatedFor = null;
-      saveMine({ timings: times, seq, offset: 0 });
+      saveMine({ timings: times, seq, offset: 0, rev: revision() });
       $('offVal').textContent = '0.0s';
       toast((n === total ? 'Timings saved for every line ✓' : `Saved ${n} of ${total} lines — run Sync again later to finish.`)
         + (skipped ? ` Skipped ${skipped} line${skipped > 1 ? 's' : ''} not in the recording.` : ''));

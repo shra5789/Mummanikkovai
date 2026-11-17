@@ -8,7 +8,7 @@ window.SLOKAM_LIBRARY = [
     items: [
       { n: 1, iast: 'tirupallāṇḍu', native: 'திருப்பல்லாண்டு', text: 'tirupallandu', youtube: 'elIW-0wTHcI', duration: 443 },
       { n: 2, iast: 'tiruppaḷḷiyezucci', native: 'திருப்பள்ளியெழுச்சி', text: 'tiruppalliyezucci', youtube: 'VFFJvjro4eQ', duration: 327 },
-      { n: 3, iast: 'tiruppāvai', native: 'திருப்பாவை', text: 'tiruppavai', youtube: 'ZIwAnJDfPvE', duration: 327 },
+      { n: 3, iast: 'tiruppāvai', native: 'திருப்பாவை', text: 'tiruppavai', youtube: 'tqrJueDJ1II' },
       { n: 4, iast: 'nīrāṭṭam', native: 'நீராட்டம்' },
       { n: 5, iast: 'pūccūṭṭal', native: 'பூச்சூட்டல்', text: 'puccuttal', youtube: 'NiM4ICBSkgw', duration: 193 },
       { n: 6, iast: 'kāppiḍal', native: 'காப்பிடல்', text: 'kappidal', youtube: 'cDV-Mo8n_kI', duration: 211 },
