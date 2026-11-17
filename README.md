@@ -22,13 +22,28 @@ Available now:
 | 8 | **அமலனாதிபிரான்** · amalanādipirān | 〃 | with taniyans |
 | 9 | **கண்ணிநுண் சிறுத்தாம்பு** · kaṇṇinuṇ śiṟuttāmbu | 〃 | with taniyans |
 | 17 | **மும்மணிக்கோவை** · mummaṇikkōvai | [Thiruvayindhai K. Malolakannan & N. S. Ranganathan](https://youtu.be/_S8ixInldNY) | the ten pāsurams |
+| 24 | **श्रीहयग्रीवस्तोत्रम्** · śrīhayagrīvastōtram | [Malola Kannan & N S Ranganathan](https://youtu.be/URLFjODqAoc) | with the opening and closing taniyan |
+| 25 | **श्रीदशावतारस्तोत्रम्** · śrīdaśāvatārastōtram | [Malola Kannan & N S Ranganathan](https://youtu.be/LeH3SspGN5w) | with the opening and closing taniyan |
+| 27 | **श्री अभीतिस्तवः** · śrī abhītistavaḥ | [Tiruvaindai Dr. K. Malolakannan](https://youtu.be/mPJXXUF_lnk) | with the opening and closing taniyan |
 | 28 | **श्रीदयाशतकम्** · śrīdayāśatakam | [Tiruvaindai Dr. K. Malolakannan](https://youtu.be/uFv0QOS2ROA) | with the opening and closing taniyan |
-| 36 | **श्रीस्तुतिः** · śrīstutiḥ | [YouTube](https://youtu.be/YagbUn2fZWw) | with the opening and closing taniyan |
-| 37 | **श्रीभूस्तुतिः** · śrībhūstutiḥ | [YouTube](https://youtu.be/uQf4CMbF0SY) | with the opening and closing taniyan |
-| 38 | **श्रीगोदास्तुतिः** · śrīgōdāstutiḥ | [YouTube](https://youtu.be/KVdQ-VPiSbY) | with the opening and closing taniyan |
+| 31 | **श्रीकामासिकाष्टकम्** · śrīkāmāsikāṣṭakam | [Malola Kannan & N S Ranganathan](https://youtu.be/zc0uAzv1B6Q) | with the opening and closing taniyan |
+| 33 | **श्री अच्चुअसअअं** · śrī accuasaaam | [Tiruvaindai Dr. K. Malolakannan](https://youtu.be/aB1MQh0E678) | the Prakrit ślōkas (the PDF's Sanskrit chāyā is left out), with the taniyans |
+| 34 | **श्रीमहावीरवैभवम्** · raghuvīra gadyam | [Malola Kannan & N S Ranganathan](https://youtu.be/pz_T4_MqNOc) | prose, one phrase per line, by kāṇḍa |
+| 35 | **श्रीगोपालविंशतिः** · śrīgōpālaviṃśatiḥ | [Malola Kannan & N S Ranganathan](https://youtu.be/EIygjUa4xK8) | with the opening and closing taniyan |
+| 36 | **श्रीस्तुतिः** · śrīstutiḥ | [Malola Kannan & N S Ranganathan](https://youtu.be/YagbUn2fZWw) | with the opening and closing taniyan |
+| 37 | **श्रीभूस्तुतिः** · śrībhūstutiḥ | [Tiruvaindai Dr. K. Malolakannan](https://youtu.be/uQf4CMbF0SY) | with the opening and closing taniyan |
+| 38 | **श्रीगोदास्तुतिः** · śrīgōdāstutiḥ | [Malola Kannan & N S Ranganathan](https://youtu.be/KVdQ-VPiSbY) | with the opening and closing taniyan |
+| 39 | **श्रीन्यासदशकम्** · śrīnyāsadaśakam | [Tiruvaindai Dr. K. Malolakannan](https://youtu.be/92vJYEn0X9Y) | with the opening and closing taniyan |
+| 40 | **श्रीसुदर्शनाष्टकम्** · śrīsudarśanāṣṭakam | [Malola Kannan](https://youtu.be/rpd2QJeV54Y) | with the opening and closing taniyan |
+| 41 | **श्री षोडशायुधस्तोत्रम्** · śrī ṣōḍaśāyudhastōtram | [Malola Kannan](https://youtu.be/VFGj8Y-oTDU) | with the opening and closing taniyan |
+| 43 | **श्रीदेशिकमङ्गळम्** · śrīdēśikamaṅgaḷam | [Malola Kannan & N S Ranganathan](https://youtu.be/0zhWV393WPY) | with its two opening and two closing taniyans, and the saptati ratna mālikā ślōkas |
 | 44 | **पुरुषसूक्तम्** · puruṣasūktam | [Malola Kannan](https://youtu.be/ga0cKR93P6w) | with the svara marks (॒ ॑ ᳚) |
 
 Taniyans are included wherever prapatti.com prints them. If a recording leaves one out, press **S** for its lines while syncing.
+
+The Dēśika stōtras use Maalola Kannan's recordings: Amutham Music's "Desika Stotram" series where there is one,
+otherwise his Achyuthapaaduka channel. No Maalola Kannan recording turned up for 26, 29, 30, 32 or 42, nor for
+Varadarāja Pañcāśat, so those wait for a link.
 
 ## Features
 

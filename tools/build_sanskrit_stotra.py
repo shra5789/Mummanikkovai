@@ -52,15 +52,15 @@ start = next(k for k, l in enumerate(lines) if l.startswith('śrīmān vēṅka�
 body = [l for l in lines[start:] if l and not SKIP.match(l) and l not in titles
         and re.sub(r'\s', '', l) != heading]
 
-# After "iti … samāptam" only the closing taniyan (kavitārkikasiṃhāya …) is recited; some PDFs
-# (e.g. Dēśikamaṅgaḷam) print an appendix of other ślōkas there, which is left out.
+# After "iti … samāptam" come the closing taniyans, from kavitārkikasiṃhāya … on (Dēśikamaṅgaḷam
+# has two: kavitārkikasiṃhāya … and vādidvipaśirōbhaṅga …).
 cut = next((k for k, l in enumerate(body) if l.startswith('ÁÁ iti')), None)
 closing_lines = []
 if cut is not None:
     tail = body[cut + 1:]
     k = next((j for j, l in enumerate(tail) if l.startswith('kavitārkikasiṃhāya')), None)
     if k is not None:
-        closing_lines = tail[k:k + 2]
+        closing_lines = tail[k:]
     body = body[:cut]
 
 # ---- group into display lines. Each PDF line is normally one line of the ślōka; in long metres
@@ -126,7 +126,13 @@ else:
 
 closing = max(u['v'] for u in units) + 1 if closing_lines else None
 if closing_lines:
-    flush(closing_lines, closing)
+    chunk = []
+    for l in closing_lines:          # one taniyan at a time, so each gets its own । and ॥
+        chunk.append(l)
+        if END.search(l):
+            flush(chunk, closing); chunk = []
+    if chunk:
+        flush(chunk, closing)
     labels[closing] = 'तनियन्'
 
 def dev(t):
