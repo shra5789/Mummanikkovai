@@ -21,7 +21,12 @@ Available now:
 | 7 | **சென்னியோங்கு** · śenniyōṅgu | 〃 | Periyāḻvār Tirumoḻi 5.4 |
 | 8 | **அமலனாதிபிரான்** · amalanādipirān | 〃 | with taniyans |
 | 9 | **கண்ணிநுண் சிறுத்தாம்பு** · kaṇṇinuṇ śiṟuttāmbu | 〃 | with taniyans |
+| 10 | **இராமாநுச நூற்றந்தாதி** · irāmānuśa nūṟṟandādi | [Maalola Kannan & N S Ranganathan](https://youtu.be/-PkD67xhHf0) | with taniyans |
 | 17 | **மும்மணிக்கோவை** · mummaṇikkōvai | [Thiruvayindhai K. Malolakannan & N. S. Ranganathan](https://youtu.be/_S8ixInldNY) | the ten pāsurams |
+| 19 | **அதிகாரஸங்க்ரஹம்** · adikārasaṅgraham | [Malola Kannan](https://youtu.be/aS4UwpNdbHo) | with Swami Dēśikan's taniyan |
+| 21 | **ப்ரபந்தஸாரம்** · prabandasāram | [Maalola Kannan & N S Ranganathan](https://youtu.be/e_RE0UgoD98) | with taniyans |
+| 22 | **பிள்ளையந்தாதி** · piḷḷaiyandādi | [Maalola Kannan & N S Ranganathan](https://youtu.be/M-wqP9qrWUk) | with taniyans |
+| 23 | **மெய்விரதமான்மியம்** · meyviradamānmiyam | [Malola Kannan](https://youtu.be/srhs3FWZLBw) | with taniyans |
 | 24 | **श्रीहयग्रीवस्तोत्रम्** · śrīhayagrīvastōtram | [Malola Kannan & N S Ranganathan](https://youtu.be/URLFjODqAoc) | with the opening and closing taniyan |
 | 25 | **श्रीदशावतारस्तोत्रम्** · śrīdaśāvatārastōtram | [Malola Kannan & N S Ranganathan](https://youtu.be/LeH3SspGN5w) | with the opening and closing taniyan |
 | 27 | **श्री अभीतिस्तवः** · śrī abhītistavaḥ | [Tiruvaindai Dr. K. Malolakannan](https://youtu.be/mPJXXUF_lnk) | with the opening and closing taniyan |
@@ -38,12 +43,20 @@ Available now:
 | 41 | **श्री षोडशायुधस्तोत्रम्** · śrī ṣōḍaśāyudhastōtram | [Malola Kannan](https://youtu.be/VFGj8Y-oTDU) | with the opening and closing taniyan |
 | 43 | **श्रीदेशिकमङ्गळम्** · śrīdēśikamaṅgaḷam | [Malola Kannan & N S Ranganathan](https://youtu.be/0zhWV393WPY) | with its two opening and two closing taniyans, and the saptati ratna mālikā ślōkas |
 | 44 | **पुरुषसूक्तम्** · puruṣasūktam | [Malola Kannan](https://youtu.be/ga0cKR93P6w) | with the svara marks (॒ ॑ ᳚) |
+| 45 | **विष्णुसूक्तम्** · viṣṇusūktam | [Malola Kannan](https://youtu.be/RiPlUn47R7U) | with the svara marks |
+| 46 | **नारायणसूक्तम्** · nārāyaṇasūktam | [Malola Kannan](https://youtu.be/8OJWvbkjedQ) | with the svara marks |
+| 47 | **श्रीसूक्तम्** · śrīsūktam | [Malola Kannan](https://youtu.be/kX1zmwj5NrQ) | with the svara marks |
+| 48 | **भूसूक्तम्** · bhūsūktam | [Malola Kannan](https://youtu.be/YCuo85TkFEA) | with the svara marks |
+| 49 | **नीळासूक्तम्** · nīḷāsūktam | [Malola Kannan](https://youtu.be/ePOc-Pn1bpY) | with the svara marks |
 
 Taniyans are included wherever prapatti.com prints them. If a recording leaves one out, press **S** for its lines while syncing.
+In the Vēdam texts, the alternate readings prapatti.com prints in red are left out.
 
-The Dēśika stōtras use Maalola Kannan's recordings: Amutham Music's "Desika Stotram" series where there is one,
-otherwise his Achyuthapaaduka channel. No Maalola Kannan recording turned up for 26, 29, 30, 32 or 42, nor for
-Varadarāja Pañcāśat, so those wait for a link.
+Every recording is Maalola Kannan's: Amutham Music's series (Desika Stotram, Nithyanusandhanam, Ramanusa
+Noottrandhadi, Panchasuktham) where there is one, otherwise his Achyuthapaaduka channel or GSPK. Still waiting for
+a recording: nīrāṭṭam (4), vāraṇamāyiram (11), tiruvezukūṟṟirukkai (12), aṅgaṇ ñālam (13), kāśaiyāḍai (14),
+vāṇilā muṟuval (15), aḍaikkalappattu (16), navamaṇimālai (18), vaiṇava dinaśari (20), and stōtras 26, 29, 30, 32
+and 42. Some of these exist only inside long combined recordings (Kovil Thiruvaimozhi, Desika Prabandham Vol 1–3).
 
 ## Features
 

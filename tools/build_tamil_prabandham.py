@@ -23,6 +23,8 @@ ap.add_argument('--taniyans', action='store_true', help='with --section: put the
 ap.add_argument('--extra-taniyans', metavar='TEXT:FIRST-LAST',
                 help='put numbered taniyans from another repaired text first, e.g. '
                      'naalaayirattaniyangal_vad.txt:1-5 (chanted before the work\'s own taniyans)')
+ap.add_argument('--desika', action='store_true',
+                help='a Dēśika prabandham PDF: no "தனியன்கள்" heading; everything before pāsuram 1 is taniyans')
 ap.add_argument('--revision', type=int, default=1,
                 help='bump when the lines change, so the app drops timings synced to the old lines')
 args = ap.parse_args()
@@ -66,6 +68,22 @@ if args.section:
     if args.taniyans:
         t = next(k for k, l in enumerate(raw) if l == 'தனியன்கள்')
         taniyan_blocks = taniyans_after(t)
+elif args.desika:
+    doc_title = next(l for l in raw if l and not JUNK.match(l))
+    clean_raw = [l for l in raw if l and not JUNK.match(l) and l not in titles and l != doc_title]
+    k1 = next(k for k, l in enumerate(clean_raw) if (m := VERSE_END.search(l)) and m.group(1) == '1')
+    blocks, cur = [], []
+    for l in clean_raw[:k1 + 1]:
+        cur.append(l)
+        sanskrit = SANSKRIT.search(cur[0]) is not None
+        # a Sanskrit taniyan ends with "॥ ॥"; a Tamil one (four lines) at a line without ⋆
+        if VERSE_END.search(l) or (sanskrit and l.endswith('॥ ॥')) or \
+                (not sanskrit and len(cur) >= 4 and not l.endswith('⋆') and not l.endswith('॥')):
+            blocks.append(cur); cur = []
+    taniyan_blocks, verse1 = blocks[:-1], blocks[-1]
+    rest = clean_raw[k1 + 1:]
+    end = next((k for k, l in enumerate(rest) if l.endswith('முற்றிற்று') or l.startswith('அடிவரவு')), len(rest))
+    body = verse1 + rest[:end]
 else:
     t = next(k for k, l in enumerate(raw) if l == 'தனியன்கள்')
     taniyan_blocks = taniyans_after(t)
@@ -105,6 +123,8 @@ for n, block in enumerate(taniyan_blocks, 1):
     for l in block:
         text = re.sub(r'\s+', ' ', re.sub(r'[⋆‡॥]', '', l)).strip()
         text = re.sub(r'\s+-$', '-', text)  # a compound running on into the next line keeps its hyphen attached
+        for a, b in {'பாரொன்ற ச்சொன்ன': 'பாரொன்றச் சொன்ன', 'வானேற ப்போமளவும்': 'வானேறப் போமளவும்'}.items():
+            text = text.replace(a, b)  # glyph-gap glitches in Swami Dēśikan's taniyan
         lines.append({'v': -n, 'text': text})
 lines += out
 
