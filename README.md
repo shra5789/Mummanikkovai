@@ -6,8 +6,8 @@ scrolling line by line the way Spotify's lyrics view does.
 ## Slokams
 
 Press **☰** (or `L`) to choose a slokam. The menu has room for the full collection in four categories:
-divya prabandaṅgaḷ, dēśika prabandaṅgaḷ, dēśika stōtramālā and vēdam. Tamil works are listed in Tamil
-and IAST, and Sanskrit works in IAST and Devanagari. Entries marked *soon* are placeholders for now.
+divya prabandaṅgaḷ, dēśika prabandaṅgaḷ, dēśika stōtramālā and vēdam. Each entry shows its original
+script (Tamil or Devanagari) with IAST underneath. Entries marked *soon* are placeholders for now.
 
 Available now:
 

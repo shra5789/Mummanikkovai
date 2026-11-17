@@ -306,22 +306,22 @@
       list.appendChild(sec);
       const h = document.createElement('div');
       h.className = 'lib-cat';
-      // Tamil works: Tamil first, IAST under it; Sanskrit works: IAST first, Devanagari under it
-      const [main, sub] = cat.lang === 'ta' ? [cat.native, cat.iast] : [cat.iast, cat.native];
+      // original script (Tamil or Devanagari) first, IAST under it
+      const [main, sub] = [cat.native, cat.iast];
       h.innerHTML = `<span class="lib-main"></span><span class="lib-sub"></span>`;
       h.children[0].textContent = main; h.children[1].textContent = sub;
-      h.children[cat.lang === 'ta' ? 0 : 1].lang = cat.lang;
+      h.children[0].lang = cat.lang;
       sec.appendChild(h);
       cat.items.forEach((it) => {
         const b = document.createElement('button');
         b.className = 'lib-item' + (it.available ? '' : ' soon') + (item && it.id === item.id ? ' current' : '');
         b.disabled = !it.available;
-        const [m, s] = cat.lang === 'ta' ? [it.native, it.iast] : [it.iast, it.native];
+        const [m, s] = [it.native, it.iast];
         b.innerHTML = '<span class="lib-n"></span><span class="lib-names"><span class="lib-main"></span><span class="lib-sub"></span></span><span class="lib-tag"></span>';
         b.querySelector('.lib-n').textContent = it.n;
         b.querySelector('.lib-main').textContent = m;
         b.querySelector('.lib-sub').textContent = s;
-        b.querySelector(cat.lang === 'ta' ? '.lib-main' : '.lib-sub').lang = cat.lang;
+        b.querySelector('.lib-main').lang = cat.lang;
         b.querySelector('.lib-tag').textContent = it.available ? (item && it.id === item.id ? '♪' : '') : 'soon';
         if (it.available) b.onclick = () => { closeLibrary(); selectSlokam(it.id); };
         sec.appendChild(b);

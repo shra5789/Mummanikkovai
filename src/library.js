@@ -1,6 +1,6 @@
 // The slokam library shown in the ☰ menu.
-// Numbers follow the user's key. Tamil works are named in Tamil + IAST, Sanskrit works in
-// IAST + Devanagari. An entry with `text` (a key into window.SLOKAM_TEXTS, from src/texts/)
+// Numbers follow the user's key. Each work is shown in its original script (Tamil or
+// Devanagari) with IAST underneath. An entry with `text` (a key into window.SLOKAM_TEXTS, from src/texts/)
 // and a recording (`youtube`) is playable; the others are reserved places for later.
 window.SLOKAM_LIBRARY = [
   {
