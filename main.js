@@ -20,6 +20,8 @@ let tray = null;
 let settings = {};
 let settingsFile = '';
 let compact = false;
+let fullscreen = false;
+let beforeFullscreen = null; // window bounds to return to when leaving full screen
 let quitting = false;
 
 // ---------- settings ----------
@@ -77,6 +79,7 @@ function createWindow(port) {
     backgroundColor: '#00000000',
     hasShadow: false,
     resizable: true,
+    maximizable: false, // double-clicking the drag bar would otherwise maximise it; full screen is our own mode
     alwaysOnTop: true,
     skipTaskbar: false,
     title: 'Slokam Player',
@@ -96,7 +99,7 @@ function createWindow(port) {
   win.once('ready-to-show', () => win.show());
 
   const remember = () => {
-    if (!win || compact || win.isMinimized()) return;
+    if (!win || compact || fullscreen || win.isMinimized()) return;
     settings.bounds = win.getBounds();
     saveSettings();
   };
@@ -113,6 +116,7 @@ function createWindow(port) {
 
 function setCompact(on) {
   if (!win || on === compact) return;
+  if (on && fullscreen) setFullscreen(false); // leave full screen first, then shrink to the pill
   if (on) {
     settings.bounds = win.getBounds();
     saveSettings();
@@ -136,6 +140,29 @@ function setCompact(on) {
   rebuildTrayMenu();
 }
 
+// Full screen: cover the whole display the widget is on (taskbar included). Done by resizing the
+// window rather than with native full screen, so the frameless, transparent window behaves the same.
+function setFullscreen(on) {
+  if (!win || on === fullscreen) return;
+  if (on) {
+    if (compact) setCompact(false);
+    beforeFullscreen = win.getBounds();
+    fullscreen = true;
+    const { bounds } = screen.getDisplayMatching(beforeFullscreen);
+    win.setResizable(false);
+    win.setMinimumSize(1, 1);
+    win.setBounds(bounds);
+    win.show(); win.focus();
+  } else {
+    fullscreen = false;
+    win.setResizable(true);
+    win.setMinimumSize(260, 140);
+    win.setBounds(visibleBounds(beforeFullscreen || settings.bounds || { ...FULL_DEFAULT, x: 100, y: 100 }));
+  }
+  win.webContents.send('fullscreen-changed', fullscreen);
+  rebuildTrayMenu();
+}
+
 function toggleVisible() {
   if (!win) return;
   if (win.isVisible()) win.hide(); else { win.show(); win.setAlwaysOnTop(true, 'screen-saver'); }
@@ -146,6 +173,7 @@ function rebuildTrayMenu() {
   if (!tray) return;
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: win && win.isVisible() ? 'Hide widget' : 'Show widget', click: toggleVisible },
+    { label: fullscreen ? 'Exit full screen' : 'Full screen', click: () => { if (!win.isVisible()) win.show(); setFullscreen(!fullscreen); } },
     { label: compact ? 'Expand' : 'Minimize to pill', click: () => { if (!win.isVisible()) win.show(); setCompact(!compact); } },
     { label: 'Play / Pause', click: () => win && win.webContents.send('command', 'toggle-play') },
     { type: 'separator' },
@@ -177,6 +205,7 @@ function createTray() {
 ipcMain.handle('settings:get', () => settings);
 ipcMain.on('settings:set', (_e, patch) => { Object.assign(settings, patch); saveSettings(); });
 ipcMain.on('win:compact', (_e, on) => setCompact(!!on));
+ipcMain.on('win:fullscreen', (_e, on) => setFullscreen(!!on));
 ipcMain.on('win:hide', () => { win && win.hide(); rebuildTrayMenu(); });
 ipcMain.on('win:quit', () => { quitting = true; app.quit(); });
 

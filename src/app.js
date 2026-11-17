@@ -14,7 +14,9 @@
     getSettings: async () => { try { return JSON.parse(localStorage.getItem('mmk') || '{}'); } catch { return {}; } },
     setSettings: (p) => { try { const s = JSON.parse(localStorage.getItem('mmk') || '{}'); localStorage.setItem('mmk', JSON.stringify({ ...s, ...p })); } catch {} },
     setCompact: (on) => applyCompact(on), hide: () => {}, quit: () => window.close(),
+    setFullscreen: (on) => { try { on ? document.documentElement.requestFullscreen() : document.exitFullscreen(); } catch {} applyFullscreen(on); },
     onCompactChanged: () => {}, onCommand: () => {},
+    onFullscreenChanged: (fn) => document.addEventListener('fullscreenchange', () => fn(!!document.fullscreenElement)),
   };
 
   const S = { opacity: 0.55, font: 1, offset: 0, video: false, loop: true, timings: null, seq: null };
@@ -79,7 +81,7 @@
     const li = lis[Math.max(line, 0)];
     if (!li) return;
     // keep the whole line (even when it wraps) clear of the faded top edge
-    const top = li.offsetTop - Math.max(vp.clientHeight * 0.24, 30);
+    const top = li.offsetTop - (isFull() ? vp.clientHeight * 0.36 : Math.max(vp.clientHeight * 0.24, 30));
     vp.scrollTo({ top, behavior: smooth ? 'smooth' : 'auto' });
   }
 
@@ -240,6 +242,15 @@
   }
   function closeSheet() { $('sheet').classList.add('hidden'); }
 
+  const isFull = () => document.body.classList.contains('fullscreen');
+  function applyFullscreen(on) {
+    document.body.classList.toggle('fullscreen', on);
+    $('btnFull').textContent = on ? '🗗' : '⛶';
+    $('btnFull').title = on ? 'Exit full screen (F or Esc)' : 'Full screen (F)';
+    entry = -2; activeLine = -2; // re-highlight and re-scroll for the new layout
+  }
+  const toggleFullscreen = () => store.setFullscreen(!isFull());
+
   function applyCompact(on) {
     document.body.classList.toggle('compact', on);
     if (!on) { entry = -2; activeLine = -2; } // next frame re-highlights and scrolls to the current line
@@ -250,6 +261,7 @@
     $('btnPlay').onclick = togglePlay; $('pillPlay').onclick = togglePlay;
     $('btnPrev').onclick = () => jumpLine(-1); $('btnNext').onclick = () => jumpLine(1);
     $('btnMin').onclick = () => store.setCompact(true);
+    $('btnFull').onclick = toggleFullscreen;
     $('btnRestore').onclick = () => store.setCompact(false);
     $('pillText').ondblclick = () => store.setCompact(false);
     $('btnClose').onclick = () => store.hide();
@@ -294,10 +306,15 @@
         case 'ArrowLeft': player && player.seek(player.time() - 5); break;
         case 'ArrowRight': player && player.seek(player.time() + 5); break;
         case 'KeyM': store.setCompact(!document.body.classList.contains('compact')); break;
-        case 'Escape': closeSheet(); break;
+        case 'KeyF': toggleFullscreen(); break;
+        case 'Escape':
+          if (!$('sheet').classList.contains('hidden')) closeSheet();
+          else if (isFull()) store.setFullscreen(false);
+          break;
       }
     });
     store.onCompactChanged(applyCompact);
+    store.onFullscreenChanged(applyFullscreen);
     store.onCommand((cmd) => { if (cmd === 'toggle-play') togglePlay(); });
   }
 

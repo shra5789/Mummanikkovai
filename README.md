@@ -10,6 +10,8 @@ Swami Desikan's **மும்மணிக்கோவை** line by line as it i
 
 - **Floats above other windows** and stays put. It's frameless and see-through, and you can drag it anywhere by its title bar.
 - **Spotify-style lyrics:** the current line fills in with a white sweep (row by row when it wraps), past lines dim, and clicking any line jumps the recitation there.
+- **Full screen** (`⛶` or `F`) fills the screen with large, centred lyrics on a dark backdrop.
+  Press `F` or `Esc` (or the `🗗` button) to go back to the small widget.
 - **Minimize** (`–` or `M`) shrinks it to a slim pill that shows only the current line. Click `⤢` to expand it again.
 - **×** hides it to the system tray. Bring it back from the tray icon or with **Ctrl + Alt + L**.
 - **Follows the repeats.** The recording recites pāsurams 1, 9 and 10 twice, so when a repeat
@@ -61,6 +63,7 @@ If everything is consistently a bit early or late, use **Timing offset** (±0.5 
 | S | In Sync mode: skip a line that isn't recited there |
 | ↑ / ↓ | Previous / next line |
 | ← / → | Back / forward 5 s |
+| F | Full screen on / off (Esc also leaves full screen) |
 | M | Minimize / expand |
 | Ctrl + Alt + L | Show / hide from anywhere |
 
