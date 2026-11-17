@@ -25,8 +25,8 @@ Available now:
 | 17 | **மும்மணிக்கோவை** · mummaṇikkōvai | [Thiruvayindhai K. Malolakannan & N. S. Ranganathan](https://youtu.be/_S8ixInldNY) | the ten pāsurams |
 | 19 | **அதிகாரஸங்க்ரஹம்** · adikārasaṅgraham | [Malola Kannan](https://youtu.be/aS4UwpNdbHo) | with Swami Dēśikan's taniyan |
 | 21 | **ப்ரபந்தஸாரம்** · prabandasāram | [Maalola Kannan & N S Ranganathan](https://youtu.be/e_RE0UgoD98) | with taniyans |
-| 22 | **பிள்ளையந்தாதி** · piḷḷaiyandādi | [Maalola Kannan & N S Ranganathan](https://youtu.be/M-wqP9qrWUk) | with taniyans |
-| 23 | **மெய்விரதமான்மியம்** · meyviradamānmiyam | [Malola Kannan](https://youtu.be/srhs3FWZLBw) | with taniyans |
+| 22 | **பிள்ளையந்தாதி** · piḷḷaiyandādi | [Maalola Kannan & N S Ranganathan](https://youtu.be/M-wqP9qrWUk) | with its own taniyan (the recording skips சீரொன்று தூப்புல்) |
+| 23 | **மெய்விரதமான்மியம்** · meyviradamānmiyam | [YouTube](https://www.youtube.com/watch?v=fv3cNTJAc_Q) | with its own taniyan (the recording skips சீரொன்று தூப்புல்) |
 | 24 | **श्रीहयग्रीवस्तोत्रम्** · śrīhayagrīvastōtram | [Malola Kannan & N S Ranganathan](https://youtu.be/URLFjODqAoc) | with the opening and closing taniyan |
 | 25 | **श्रीदशावतारस्तोत्रम्** · śrīdaśāvatārastōtram | [Malola Kannan & N S Ranganathan](https://youtu.be/LeH3SspGN5w) | with the opening and closing taniyan |
 | 27 | **श्री अभीतिस्तवः** · śrī abhītistavaḥ | [Tiruvaindai Dr. K. Malolakannan](https://youtu.be/mPJXXUF_lnk) | with the opening and closing taniyan |
@@ -110,6 +110,8 @@ If everything is consistently a bit early or late, use **Timing offset** (±0.5 
 
 - **Tamil prabandhams:** a verse whose first line starts with **‡** in the prapatti.com text is chanted twice.
   For Mummanikkovai that's pāsurams 1, 9 and 10; for Tirupallāṇḍu 1, 2, 11 and 12.
+- **Andādis** (Irāmānuśa Nūṟṟandādi, Piḷḷai Andādi, Kaṇṇinuṇ Śiṟuttāmbu): after the last pāsuram, pāsuram 1 is
+  chanted once more, and the lyrics jump back to it.
 - **Sanskrit Dēśika stōtras:** the first and last ślōkas are chanted twice. For Dayāśatakam that's ślōkas 1 and 108.
 - **Vēdam:** nothing is repeated.
 

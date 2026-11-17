@@ -36,7 +36,7 @@ window.SLOKAM_LIBRARY = [
       { n: 20, iast: 'śrī vaiṇavadinaśari', native: 'ஸ்ரீ வைணவ தினசரி' },
       { n: 21, iast: 'prabandasāram', native: 'ப்ரபந்தஸாரம்', text: 'prabandhasaram', youtube: 'e_RE0UgoD98' },
       { n: 22, iast: 'piḷḷaiyandādi', native: 'பிள்ளையந்தாதி', text: 'pillaiyandadi', youtube: 'M-wqP9qrWUk' },
-      { n: 23, iast: 'meyviradamānmiyam', native: 'மெய்விரதமான்மியம்', text: 'meyviradamanmiyam', youtube: 'srhs3FWZLBw' },
+      { n: 23, iast: 'meyviradamānmiyam', native: 'மெய்விரதமான்மியம்', text: 'meyviradamanmiyam', youtube: 'fv3cNTJAc_Q' },
     ],
   },
   {

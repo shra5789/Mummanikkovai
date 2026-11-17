@@ -3,8 +3,9 @@
 // pāsurams marked ‡ in the PDF are said twice.
 window.SLOKAM_TEXTS = window.SLOKAM_TEXTS || {};
 window.SLOKAM_TEXTS["kanninun"] = {
+  revision: 2,
   verseWord: "பாசுரம்", verseCount: 11, labels: {"-1": "தனியன்", "-2": "தனியன்"},
-  order: [-1, -2, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 11],
+  order: [-1, -2, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 11, 1],
   lines: [
     {"v": -1, "text": "அவிதி₃த விஷயாந்தர: ஶடா₂ரே:"},
     {"v": -1, "text": "உபநிஷதா₃ம் உபகா₃நமாத்ர போ₄க₃:"},

@@ -25,6 +25,10 @@ ap.add_argument('--extra-taniyans', metavar='TEXT:FIRST-LAST',
                      'naalaayirattaniyangal_vad.txt:1-5 (chanted before the work\'s own taniyans)')
 ap.add_argument('--desika', action='store_true',
                 help='a Dēśika prabandham PDF: no "தனியன்கள்" heading; everything before pāsuram 1 is taniyans')
+ap.add_argument('--drop-taniyans', metavar='N,N',
+                help='leave out these taniyans (1 = the first one printed), when the recording skips them')
+ap.add_argument('--andadi', action='store_true',
+                help='an andādi: pāsuram 1 is chanted once more after the last pāsuram')
 ap.add_argument('--revision', type=int, default=1,
                 help='bump when the lines change, so the app drops timings synced to the old lines')
 args = ap.parse_args()
@@ -118,6 +122,10 @@ if args.extra_taniyans:
             extra[int(m.group(1))] = [re.sub(r'\s*॥.*$', '', x) for x in cur]; cur = []
     taniyan_blocks = [extra[k] for k in range(first_n, last_n + 1)] + taniyan_blocks
 
+if args.drop_taniyans:
+    drop = {int(x) for x in args.drop_taniyans.split(',')}
+    taniyan_blocks = [b for k, b in enumerate(taniyan_blocks, 1) if k not in drop]
+
 lines = []
 for n, block in enumerate(taniyan_blocks, 1):
     for l in block:
@@ -130,6 +138,8 @@ lines += out
 
 verses = sorted({o['v'] for o in out})
 order = [-n for n in range(1, len(taniyan_blocks) + 1)] + [v for v in verses for _ in range(2 if v in repeated else 1)]
+if args.andadi:
+    order.append(verses[0])   # an andādi closes the circle: pāsuram 1 once more at the end
 labels = {str(-n): 'தனியன்' for n in range(1, len(taniyan_blocks) + 1)}
 
 src = args.text.rsplit('/', 1)[-1]
