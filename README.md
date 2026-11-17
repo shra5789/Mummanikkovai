@@ -91,6 +91,7 @@ The text generators in `tools/` apply these rules when they build each slokam's 
 | Space | Play / pause (in Sync mode: mark line) |
 | S | In Sync mode: skip a line that isn't recited there |
 | ↑ / ↓ | Previous / next line |
+| ⏮ / ⏭ buttons | Back to the start (press again within 3 s for the previous slokam) / next slokam |
 | ← / → | Back / forward 5 s |
 | L | Open the slokam menu |
 | F | Full screen on / off (Esc also leaves full screen) |

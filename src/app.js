@@ -354,7 +354,7 @@
   // ---------- wire up ----------
   function bind() {
     $('btnPlay').onclick = togglePlay; $('pillPlay').onclick = togglePlay;
-    $('btnPrev').onclick = () => jumpLine(-1); $('btnNext').onclick = () => jumpLine(1);
+    $('btnPrev').onclick = () => prevTrack(); $('btnNext').onclick = () => nextTrack();
     $('btnMin').onclick = () => store.setCompact(true);
     $('btnFull').onclick = toggleFullscreen;
     $('btnRestore').onclick = () => store.setCompact(false);
@@ -420,9 +420,11 @@
   let loadToken = 0, ytTimeout = null;
   const ytApiReady = () => !!(window.YT && window.YT.Player);
   function onLoop() { entry = -2; userScrollUntil = 0; }
+  let autoplay = false; // start the next player as soon as it's ready (after ⏮ / ⏭ while playing)
   function adopt(p) {
     player = p;
     p.onState = updatePlayButtons; p.onLoop = onLoop; p.loop = !!S.loop && !sync;
+    if (autoplay) { autoplay = false; p.play(); }
     updatePlayButtons();
   }
   function dropPlayer() {
@@ -471,7 +473,21 @@
   window.onYouTubeIframeAPIReady = () => { if (item && !player) loadPlayer(); };
 
   // ---------- choosing a slokam ----------
-  function selectSlokam(id) {
+  // ⏮ / ⏭ step through the playable slokams in menu order, wrapping around at the ends
+  const PLAYABLE = Object.values(ITEMS).filter((it) => it.available).sort((a, b) => a.n - b.n);
+  function stepTrack(d) {
+    const k = PLAYABLE.findIndex((it) => it.id === item.id);
+    const next = PLAYABLE[(k + d + PLAYABLE.length) % PLAYABLE.length];
+    selectSlokam(next.id, { play: !!(player && player.playing()) });
+  }
+  const nextTrack = () => stepTrack(1);
+  function prevTrack() {
+    // like a music player: restart the slokam, or go to the previous one if it has only just started
+    if (player && player.time() > 3) { player.seek(0); userScrollUntil = 0; entry = -2; }
+    else stepTrack(-1);
+  }
+
+  function selectSlokam(id, { play = false } = {}) {
     const it = ITEMS[id] && ITEMS[id].available ? ITEMS[id] : ITEMS[DEFAULT_ID];
     if (sync) finishSync(true);
     item = it; T = TEXTS[it.text];
@@ -486,6 +502,7 @@
     setEntry(-1);
     $('viewport').scrollTop = 0;
     applyLook();
+    autoplay = play;
     loadPlayer();
   }
 
