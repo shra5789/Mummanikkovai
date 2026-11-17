@@ -12,7 +12,7 @@ for p in d:
                 out += c['c']; prev = c
             lines.append(out)
 t = '\n'.join(lines)
-t = re.sub('[¦¥§Ȋ]', 'ி', t)
+t = re.sub('[¦¥§ȊȉȋȈ]', '\u0bbf', t)  # glyph variants of the ி vowel sign
 C = '[க-ஹ]'
 # pre-base vowel reorder
 t = re.sub('([ெேை])(' + C + ')', r'\2\1', t)

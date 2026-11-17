@@ -11,10 +11,23 @@ script (Tamil or Devanagari) with IAST underneath. Entries marked *soon* are pla
 
 Available now:
 
-| # | Slokam | Recording | Text |
+| # | Slokam | Recording | Text (prapatti.com) |
 | --- | --- | --- | --- |
-| 17 | **மும்மணிக்கோவை** · mummaṇikkōvai | [Thiruvayindhai K. Malolakannan & N. S. Ranganathan](https://youtu.be/_S8ixInldNY) | prapatti.com, in Tamil |
-| 28 | **श्रीदयाशतकम्** · śrīdayāśatakam | [Tiruvaindai Dr. K. Malolakannan](https://youtu.be/uFv0QOS2ROA) | prapatti.com, in Devanagari, with the opening and closing taniyan |
+| 1 | **திருப்பல்லாண்டு** · tirupallāṇḍu | [Nityānusandhānam playlist](https://www.youtube.com/playlist?list=PLCG9337skRtYbC7X1UWUuIqFklWipjLoj) | Periyāḻvār Tirumoḻi 1.1, with its taniyans |
+| 2 | **திருப்பள்ளியெழுச்சி** · tiruppaḷḷiyezucci | 〃 | with taniyans |
+| 3 | **திருப்பாவை** · tiruppāvai | 〃 | with taniyans |
+| 5 | **பூச்சூட்டல்** · pūccūṭṭal | 〃 | Periyāḻvār Tirumoḻi 2.7 |
+| 6 | **காப்பிடல்** · kāppiḍal | 〃 | Periyāḻvār Tirumoḻi 2.8 |
+| 7 | **சென்னியோங்கு** · śenniyōṅgu | 〃 | Periyāḻvār Tirumoḻi 5.4 |
+| 8 | **அமலனாதிபிரான்** · amalanādipirān | 〃 | with taniyans |
+| 9 | **கண்ணிநுண் சிறுத்தாம்பு** · kaṇṇinuṇ śiṟuttāmbu | 〃 | with taniyans |
+| 17 | **மும்மணிக்கோவை** · mummaṇikkōvai | [Thiruvayindhai K. Malolakannan & N. S. Ranganathan](https://youtu.be/_S8ixInldNY) | the ten pāsurams |
+| 28 | **श्रीदयाशतकम्** · śrīdayāśatakam | [Tiruvaindai Dr. K. Malolakannan](https://youtu.be/uFv0QOS2ROA) | with the opening and closing taniyan |
+| 36 | **श्रीस्तुतिः** · śrīstutiḥ | [YouTube](https://youtu.be/YagbUn2fZWw) | with the opening and closing taniyan |
+| 37 | **श्रीभूस्तुतिः** · śrībhūstutiḥ | [YouTube](https://youtu.be/uQf4CMbF0SY) | with the opening and closing taniyan |
+| 38 | **श्रीगोदास्तुतिः** · śrīgōdāstutiḥ | [YouTube](https://youtu.be/KVdQ-VPiSbY) | with the opening and closing taniyan |
+
+Taniyans are included wherever prapatti.com prints them. If a recording leaves one out, press **S** for its lines while syncing.
 
 ## Features
 
@@ -66,7 +79,7 @@ If everything is consistently a bit early or late, use **Timing offset** (±0.5 
 ## Repeats
 
 - **Tamil prabandhams:** a verse whose first line starts with **‡** in the prapatti.com text is chanted twice.
-  For Mummanikkovai that's pāsurams 1, 9 and 10.
+  For Mummanikkovai that's pāsurams 1, 9 and 10; for Tirupallāṇḍu 1, 2, 11 and 12.
 - **Sanskrit Dēśika stōtras:** the first and last ślōkas are chanted twice. For Dayāśatakam that's ślōkas 1 and 108.
 
 The text generators in `tools/` apply these rules when they build each slokam's playback order.
@@ -97,14 +110,18 @@ The text generators in `tools/` apply these rules when they build each slokam's 
     Ads on that page pause the lyrics until they finish.
   - If YouTube can't be reached at all, the widget falls back to a **stopwatch**: press ▶ at the moment you start the video elsewhere.
 - `src/library.js` lists every slokam in the menu. A playable entry names its text and YouTube video.
-- `src/texts/` holds one file per slokam: its lines, each tagged with its verse number, and the `order` the verses are chanted in.
-  - `tools/extract_pdf.py` (which repairs the Tamil PDF's scrambled vowel-sign order) and `tools/build_mummanikkovai.py` build `mummanikkovai.js`.
-    The PDF's taniyan and closing *சீரார் தூப்புல் …* aren't in that recording, so they're left out.
-  - `tools/build_dayasatakam.py` builds `dayasatakam.js`. prapatti.com's Devanagari PDF uses a broken font
-    encoding, so the script reads the romanised edition and converts it to Devanagari.
+- `src/texts/` holds one file per slokam: its lines, each tagged with its verse number (taniyans are negative,
+  or 0 and last + 1 for the Sanskrit stōtras), and the `order` the verses are chanted in.
+  - Tamil: `tools/extract_pdf.py` repairs a prapatti.com PDF's scrambled vowel-sign order, then
+    `tools/build_tamil_prabandham.py` builds the file, either for a whole work or for one decade of a
+    larger one (`--section 2.7`), optionally with the work's taniyans (`--taniyans`).
+    `tools/build_mummanikkovai.py` builds Mummanikkovai, whose taniyan and closing *சீரார் தூப்புல் …* aren't in its recording.
+  - Sanskrit: `tools/build_sanskrit_stotra.py` builds a Dēśika stōtra. prapatti.com's Devanagari PDFs use a broken
+    font encoding, so the script reads the romanised edition and converts it to Devanagari.
 
 ### Adding a slokam
 
-1. Write a `tools/build_<name>.py` that produces `src/texts/<name>.js` in the same shape as the existing ones, applying the repeat rule for its kind.
+1. Build `src/texts/<name>.js` with `tools/build_tamil_prabandham.py` or `tools/build_sanskrit_stotra.py`
+   (or a new script that produces the same shape, applying the repeat rule for its kind).
 2. Add `<script src="texts/<name>.js">` to `src/index.html`.
 3. In `src/library.js`, give the entry `text: '<name>'` and `youtube: '<video id>'`.
