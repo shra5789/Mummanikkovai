@@ -103,7 +103,9 @@ if args.extra_taniyans:
 lines = []
 for n, block in enumerate(taniyan_blocks, 1):
     for l in block:
-        lines.append({'v': -n, 'text': re.sub(r'\s+', ' ', re.sub(r'[⋆‡॥]', '', l)).strip()})
+        text = re.sub(r'\s+', ' ', re.sub(r'[⋆‡॥]', '', l)).strip()
+        text = re.sub(r'\s+-$', '-', text)  # a compound running on into the next line keeps its hyphen attached
+        lines.append({'v': -n, 'text': text})
 lines += out
 
 verses = sorted({o['v'] for o in out})

@@ -77,6 +77,8 @@ body.playing:not(:hover) .controls { opacity: 0; }
   transform-origin: left center;
 }
 .line:hover { background: rgba(var(--fg), .07); }
+/* a word longer than the whole line (long Sanskrit compounds) wraps instead of running off screen */
+.line .txt { overflow-wrap: anywhere; }
 .line.past { color: rgba(var(--fg), .28); }
 .line.active {
   transform: scale(1.06);
@@ -185,7 +187,7 @@ body.fullscreen .viewport {
 }
 body.fullscreen .lines { max-width: 1400px; margin: 0 auto; text-align: center; padding: 45vh 0 60vh; }
 body.fullscreen .line {
-  font-size: calc(clamp(26px, 3.2vw, 60px) * var(--scale));
+  font-size: calc(clamp(24px, 2.8vw, 52px) * var(--scale));
   line-height: 1.35; padding: .18em .4em; margin: 0;
   transform-origin: center center;
 }
