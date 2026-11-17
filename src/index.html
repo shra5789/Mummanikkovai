@@ -20,6 +20,7 @@
         </div>
       </div>
       <div class="buttons nodrag">
+        <button id="btnLibrary" class="icon" title="Choose a slokam (L)">☰</button>
         <button id="btnSettings" class="icon" title="Settings">⚙</button>
         <button id="btnFull" class="icon" title="Full screen (F)">⛶</button>
         <button id="btnMin" class="icon" title="Minimize (M)">–</button>
@@ -71,11 +72,19 @@
       <p id="timingNote" class="note"></p>
     </section>
 
+    <!-- library menu -->
+    <section id="library" class="sheet library hidden nodrag">
+      <div class="sheet-head"><b>Slokams</b><button id="btnLibClose" class="icon">×</button></div>
+      <div id="libList" class="lib-list"></div>
+    </section>
+
     <div id="toast" class="toast hidden"></div>
     <div id="videoBox" class="video-box"><div id="yt"></div></div>
   </div>
 
-  <script src="lyrics.js"></script>
+  <script src="texts/mummanikkovai.js"></script>
+  <script src="texts/dayasatakam.js"></script>
+  <script src="library.js"></script>
   <script src="player.js"></script>
   <script src="app.js"></script>
   <script src="https://www.youtube.com/iframe_api" async></script>

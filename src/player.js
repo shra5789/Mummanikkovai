@@ -1,8 +1,10 @@
-// Playback source for the widget.
+// Playback sources for the widget.
 //  * YouTubePlayer — plays the recording through YouTube's embedded player (exact timing).
-//  * ClockPlayer   — fallback stopwatch if YouTube can't be embedded/reached; the user presses
+//  * PagePlayer    — for videos whose uploader turned embedding off: the Electron main process
+//                    plays the normal YouTube page in its own window and reports the position.
+//  * ClockPlayer   — last-resort stopwatch if YouTube can't be reached; the user presses
 //                    play at the same moment they start the video elsewhere.
-// Both expose: time(), duration(), playing(), play(), pause(), seek(sec), and fire onState().
+// All expose: time(), duration(), playing(), play(), pause(), seek(sec), destroy(), and fire onState().
 // Set `loop = true` to restart from 0:00 automatically when the recording ends.
 
 class ClockPlayer {
@@ -23,6 +25,44 @@ class ClockPlayer {
   play() { if (this._startedAt == null) { this._startedAt = performance.now(); this.onState(); } }
   pause() { if (this._startedAt != null) { this._base = this.time(); this._startedAt = null; this.onState(); } }
   seek(t) { this._base = Math.max(0, Math.min(t, this._dur)); if (this._startedAt != null) this._startedAt = performance.now(); this.onState(); }
+  destroy() { this._startedAt = null; }
+}
+
+class PagePlayer {
+  // `api` is window.widget.ytPage from the preload script
+  constructor(api, videoId, duration, { show, onNeedsUser }) {
+    this.kind = 'page';
+    this.api = api; this._dur = duration; this.onState = () => {}; this.loop = true;
+    this._t = 0; this._at = performance.now(); this._paused = true; this._ad = false; this._dead = false;
+    this._unsub = api.onState((st) => {
+      if (this._dead) return;
+      if (st.needsUser) return onNeedsUser && onNeedsUser();
+      if (!st.found) return;
+      const wasPlaying = this.playing();
+      this._ad = st.ad;
+      if (!st.ad) {
+        if (st.d) this._dur = st.d;
+        this._t = st.t; this._at = performance.now(); this._paused = st.paused;
+        if ((st.ended || (st.d && st.t >= st.d - 0.25)) && !st.paused && this.loop) {
+          this.seek(0); this.play(); this.onLoop && this.onLoop();
+        }
+      }
+      if (wasPlaying !== this.playing()) this.onState();
+    });
+    api.open(videoId, show);
+  }
+  time() {
+    if (this._paused || this._ad) return this._t;
+    return Math.min(this._t + Math.min((performance.now() - this._at) / 1000, 0.5), this._dur);
+  }
+  duration() { return this._dur; }
+  playing() { return !this._paused && !this._ad; }
+  adPlaying() { return this._ad; }
+  play() { this.api.cmd('play'); this._paused = false; this._at = performance.now(); this.onState(); }
+  pause() { this.api.cmd('pause'); this._t = this.time(); this._paused = true; this.onState(); }
+  seek(t) { t = Math.max(0, t); this.api.cmd('seek', t); this._t = t; this._at = performance.now(); }
+  show(on) { this.api.cmd('show', on); }
+  destroy() { this._dead = true; if (typeof this._unsub === 'function') this._unsub(); this.api.close(); }
 }
 
 class YouTubePlayer {
@@ -67,4 +107,5 @@ class YouTubePlayer {
   play() { this._ready && this.p.playVideo(); }
   pause() { this._ready && this.p.pauseVideo(); }
   seek(t) { if (this._ready) { this.p.seekTo(Math.max(0, t), true); this._lastT = t; this._lastAt = performance.now(); } }
+  destroy() { try { this.p.destroy(); } catch {} }
 }

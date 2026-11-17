@@ -1,23 +1,33 @@
 # Slokam Player
 
-A floating lyrics widget for Windows that plays slokam recitations with the words in sync.
-The first slokam it includes is Swami Desikan's Mummanikkovai.
+A floating lyrics widget for Windows that plays slokam recitations from YouTube with the words in sync,
+scrolling line by line the way Spotify's lyrics view does.
 
-It's a small, transparent, always-on-top widget that plays
-[the Mummanikkovai recitation](https://youtu.be/_S8ixInldNY)
-(Thiruvayindhai K. Malolakannan & N. S. Ranganathan) and shows
-Swami Desikan's **மும்மணிக்கோவை** line by line as it is recited, scrolling the way Spotify's lyrics view does.
+## Slokams
+
+Press **☰** (or `L`) to choose a slokam. The menu has room for the full collection in four categories:
+divya prabandaṅgaḷ, dēśika prabandaṅgaḷ, dēśika stōtramālā and vēdam. Tamil works are listed in Tamil
+and IAST, and Sanskrit works in IAST and Devanagari. Entries marked *soon* are placeholders for now.
+
+Available now:
+
+| # | Slokam | Recording | Text |
+| --- | --- | --- | --- |
+| 17 | **மும்மணிக்கோவை** · mummaṇikkōvai | [Thiruvayindhai K. Malolakannan & N. S. Ranganathan](https://youtu.be/_S8ixInldNY) | prapatti.com, in Tamil |
+| 28 | **श्रीदयाशतकम्** · śrīdayāśatakam | [Tiruvaindai Dr. K. Malolakannan](https://youtu.be/uFv0QOS2ROA) | prapatti.com, in Devanagari, with the opening and closing taniyan |
+
+## Features
 
 - **Floats above other windows** and stays put. It's frameless and see-through, and you can drag it anywhere by its title bar.
 - **Spotify-style lyrics:** the current line fills in with a white sweep (row by row when it wraps), past lines dim, and clicking any line jumps the recitation there.
+- **Follows the repeats.** When a verse is chanted a second time, the highlight jumps back to it and the header
+  shows *மீண்டும்* (Tamil) or *पुनः* (Sanskrit). See [Repeats](#repeats).
 - **Full screen** (`⛶` or `F`) fills the screen with large, centred lyrics on a dark backdrop.
   Press `F` or `Esc` (or the `🗗` button) to go back to the small widget.
 - **Minimize** (`–` or `M`) shrinks it to a slim pill that shows only the current line. Click `⤢` to expand it again.
 - **×** hides it to the system tray. Bring it back from the tray icon or with **Ctrl + Alt + L**.
-- **Follows the repeats.** The recording recites pāsurams 1, 9 and 10 twice, so when a repeat
-  starts the highlight jumps back to that pāsuram, and the header shows *மீண்டும்*.
-- **Loops** the recitation and starts again from the first pāsuram when it ends. You can turn this off in ⚙.
-- Settings for background transparency, text size, a timing offset, showing the small video, and *Start with Windows* (in the tray menu).
+- **Loops** the recitation and starts again from the beginning when it ends. You can turn this off in ⚙.
+- Settings for background transparency, text size, a timing offset, showing the video, and *Start with Windows* (in the tray menu).
 
 ## Get it
 
@@ -37,23 +47,29 @@ npm start          :: run the widget
 npm run dist       :: build the .exe files into dist\
 ```
 
-## Timing: please sync once
+## Timing: sync each slokam once
 
-The lyrics come from prapatti.com's PDF, and they're complete. The **start time of each line is
-estimated**, though, because the timings were spread across the 6:56 recording by syllable count and
-not taken from the audio. They'll be close but will drift.
+The texts are complete, but the **start time of each line is estimated**: the app spreads the lines
+over the recording's length by how many letters each has. They'll be close but will drift.
 
-Sync them once and they'll be exact from then on:
+Sync a slokam once and its timings are exact from then on:
 
-1. ⚙ → **Sync timings…**. The recording restarts from 0:00.
+1. Choose the slokam, then ⚙ → **Sync timings…**. The recording restarts from 0:00.
 2. Press **Space** (or click *Mark*) the moment each highlighted line **starts** being recited.
-   Sync follows the recording's order, so after pāsuram 1 it takes you back to its first line for
-   the repeat, and the same happens at pāsurams 9 and 10. The banner shows which pāsuram is next.
+   Sync follows the order the verses are chanted in, repeats included, and the banner shows which verse is next.
    If a highlighted line isn't said at that point, press **S** (or *Skip*) and it's left out of the timeline.
    Press **Backspace** to undo a mark or skip, and **Esc** to stop early. Your marks are kept and the remaining lines shift to match.
-3. Your timings are saved on your PC. *Reset timings* goes back to the estimates.
+3. Your timings are saved on your PC, separately for each slokam. *Reset timings* goes back to the estimates.
 
 If everything is consistently a bit early or late, use **Timing offset** (±0.5 s steps) in ⚙ instead.
+
+## Repeats
+
+- **Tamil prabandhams:** a verse whose first line starts with **‡** in the prapatti.com text is chanted twice.
+  For Mummanikkovai that's pāsurams 1, 9 and 10.
+- **Sanskrit Dēśika stōtras:** the first and last ślōkas are chanted twice. For Dayāśatakam that's ślōkas 1 and 108.
+
+The text generators in `tools/` apply these rules when they build each slokam's playback order.
 
 ## Keyboard
 
@@ -63,6 +79,7 @@ If everything is consistently a bit early or late, use **Timing offset** (±0.5 
 | S | In Sync mode: skip a line that isn't recited there |
 | ↑ / ↓ | Previous / next line |
 | ← / → | Back / forward 5 s |
+| L | Open the slokam menu |
 | F | Full screen on / off (Esc also leaves full screen) |
 | M | Minimize / expand |
 | Ctrl + Alt + L | Show / hide from anywhere |
@@ -72,13 +89,22 @@ If everything is consistently a bit early or late, use **Timing offset** (±0.5 
 - `main.js` (Electron) creates the frameless, transparent, always-on-top window plus the tray icon, and stores
   settings in `%APPDATA%\Slokam Player\settings.json`. It serves `src/` from `127.0.0.1` because
   YouTube's embedded player won't run from a `file://` page.
-- `src/player.js` drives YouTube's embedded player, which gives the exact playback position. If YouTube can't
-  be reached or refuses the embed, the widget falls back to a stopwatch: press ▶ at the moment you start the video elsewhere.
-- `src/lyrics.js` holds the text, the order the recording recites the pāsurams in (`order`), and a
-  `timeline` of every recited line in playback order with its default start time.
-  It's generated by `tools/extract_pdf.py` (which repairs the PDF's scrambled Tamil vowel-sign order) and
-  `tools/build_lyrics.py`. Which pāsurams repeat comes from the PDF: a pāsuram whose first line starts with **‡** is chanted
-  twice, so the generator puts it in the playback order twice.
+- `src/player.js` plays the recording and reports the exact playback position:
+  - Most videos play in YouTube's **embedded player** inside the widget.
+  - Some uploaders turn embedding off; the Dayāśatakam video is one of them. For those, the app opens the
+    **normal YouTube page in a separate window**, kept hidden unless *Show video* is on, and controls it from
+    the widget. If YouTube shows a cookie or sign-in page first, that window appears so you can click through it.
+    Ads on that page pause the lyrics until they finish.
+  - If YouTube can't be reached at all, the widget falls back to a **stopwatch**: press ▶ at the moment you start the video elsewhere.
+- `src/library.js` lists every slokam in the menu. A playable entry names its text and YouTube video.
+- `src/texts/` holds one file per slokam: its lines, each tagged with its verse number, and the `order` the verses are chanted in.
+  - `tools/extract_pdf.py` (which repairs the Tamil PDF's scrambled vowel-sign order) and `tools/build_mummanikkovai.py` build `mummanikkovai.js`.
+    The PDF's taniyan and closing *சீரார் தூப்புல் …* aren't in that recording, so they're left out.
+  - `tools/build_dayasatakam.py` builds `dayasatakam.js`. prapatti.com's Devanagari PDF uses a broken font
+    encoding, so the script reads the romanised edition and converts it to Devanagari.
 
-The widget shows the 10 pāsurams as recited in the recording. The PDF's taniyan and closing
-*சீரார் தூப்புல் … திருவடிகளே சரணம்* aren't in the audio, so they're left out.
+### Adding a slokam
+
+1. Write a `tools/build_<name>.py` that produces `src/texts/<name>.js` in the same shape as the existing ones, applying the repeat rule for its kind.
+2. Add `<script src="texts/<name>.js">` to `src/index.html`.
+3. In `src/library.js`, give the entry `text: '<name>'` and `youtube: '<video id>'`.

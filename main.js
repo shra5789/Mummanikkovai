@@ -1,6 +1,8 @@
 // Slokam Player — Electron main process.
-// A small, frameless, transparent, always-on-top window that plays the
-// recording through YouTube's embedded player and shows the lyrics in sync.
+// A small, frameless, transparent, always-on-top window that plays a slokam recording
+// from YouTube and shows the lyrics in sync. Most videos play in YouTube's embedded player
+// inside the widget; for videos whose uploader has turned embedding off, the normal YouTube
+// page is played in a separate (normally hidden) window and controlled from here.
 
 const { app, BrowserWindow, Tray, Menu, ipcMain, screen, globalShortcut, nativeImage, shell } = require('electron');
 const http = require('http');
@@ -201,6 +203,74 @@ function createTray() {
   rebuildTrayMenu();
 }
 
+// ---------- YouTube page player (for videos that can't be embedded) ----------
+let yt = null; // { win, timer, videoId, shownForHelp }
+const YT_PROBE = `(() => {
+  const v = document.querySelector('#movie_player video, video');
+  if (!v) return { found: false, consent: !!document.querySelector('form[action*="consent"], ytd-consent-bump-v2-lightbox, tp-yt-paper-dialog') };
+  const ad = !!document.querySelector('#movie_player.ad-showing');
+  return { found: true, t: v.currentTime, d: v.duration || 0, paused: v.paused, ended: v.ended, ad };
+})()`;
+
+function ytSend(msg) { if (win && !win.isDestroyed()) win.webContents.send('ytpage:state', msg); }
+
+function ytClose() {
+  if (!yt) return;
+  clearInterval(yt.timer);
+  if (!yt.win.isDestroyed()) yt.win.destroy();
+  yt = null;
+}
+
+function ytOpen(videoId, show) {
+  ytClose();
+  const w = new BrowserWindow({
+    width: 640, height: 400, show: !!show, title: 'Slokam Player — YouTube', icon: ICON, autoHideMenuBar: true,
+    webPreferences: { partition: 'persist:youtube', backgroundThrottling: false, contextIsolation: true, sandbox: true },
+  });
+  // look like a normal browser so YouTube serves its regular page
+  w.webContents.setUserAgent(w.webContents.getUserAgent().replace(/\s(Electron|slokam-player)\/\S+/g, ''));
+  w.on('close', (e) => { if (!quitting) { e.preventDefault(); w.hide(); settings.video = false; ytSend({ hidden: true }); } });
+  w.loadURL(`https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`);
+  yt = { win: w, videoId, startedAt: Date.now(), userPlayed: false, ready: false, shownForHelp: false };
+  yt.timer = setInterval(async () => {
+    if (!yt || yt.win.isDestroyed()) return;
+    // YouTube may autoplay another video when ours ends: go back to ours, paused
+    const url = yt.win.webContents.getURL();
+    if (url.includes('/watch') && !url.includes(yt.videoId)) {
+      yt.userPlayed = false; yt.ready = false;
+      yt.win.loadURL(`https://www.youtube.com/watch?v=${encodeURIComponent(yt.videoId)}`);
+      return;
+    }
+    let st;
+    try { st = await yt.win.webContents.executeJavaScript(YT_PROBE, true); } catch { return; }
+    if (!st.found) {
+      // a consent / sign-in page is in the way: show the window so the user can click through it
+      if (!yt.shownForHelp && (st.consent || Date.now() - yt.startedAt > 15000)) {
+        yt.shownForHelp = true; yt.win.show(); ytSend({ needsUser: true });
+      }
+      return;
+    }
+    if (!yt.ready && !st.ad) {
+      yt.ready = true;
+      // YouTube autoplays the page; wait for the user to press play in the widget
+      if (!yt.userPlayed) yt.win.webContents.executeJavaScript('document.querySelector("#movie_player video, video").pause()', true).catch(() => {});
+    }
+    ytSend(st);
+  }, 200);
+}
+
+function ytCommand(cmd, arg) {
+  if (!yt || yt.win.isDestroyed()) return;
+  if (cmd === 'play') yt.userPlayed = true;
+  const js = {
+    play: 'v.play()',
+    pause: 'v.pause()',
+    seek: `v.currentTime = ${Number(arg) || 0}`,
+  }[cmd];
+  if (cmd === 'show') { arg ? yt.win.show() : yt.win.hide(); return; }
+  if (js) yt.win.webContents.executeJavaScript(`(() => { const v = document.querySelector('#movie_player video, video'); if (v) { ${js}; } })()`, true).catch(() => {});
+}
+
 // ---------- IPC ----------
 ipcMain.handle('settings:get', () => settings);
 ipcMain.on('settings:set', (_e, patch) => { Object.assign(settings, patch); saveSettings(); });
@@ -208,6 +278,9 @@ ipcMain.on('win:compact', (_e, on) => setCompact(!!on));
 ipcMain.on('win:fullscreen', (_e, on) => setFullscreen(!!on));
 ipcMain.on('win:hide', () => { win && win.hide(); rebuildTrayMenu(); });
 ipcMain.on('win:quit', () => { quitting = true; app.quit(); });
+ipcMain.on('ytpage:open', (_e, videoId, show) => ytOpen(String(videoId), show));
+ipcMain.on('ytpage:close', () => ytClose());
+ipcMain.on('ytpage:cmd', (_e, cmd, arg) => ytCommand(cmd, arg));
 
 // ---------- app lifecycle ----------
 if (!app.requestSingleInstanceLock()) {

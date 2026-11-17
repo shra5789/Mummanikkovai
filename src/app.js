@@ -1,13 +1,19 @@
 /* Slokam Player — renderer */
 (function () {
   const $ = (id) => document.getElementById(id);
-  const L = window.LYRICS;
+  const LIB = window.SLOKAM_LIBRARY;
+  const TEXTS = window.SLOKAM_TEXTS || {};
+  const REPEAT_WORD = { ta: 'மீண்டும்', sa: 'पुनः' };
 
-  // Playback follows a *timeline*: every recited line in the order the recording says it,
-  // so repeated pāsurams appear more than once. seq[e] is the line shown for timeline entry e,
-  // times[e] is when that entry starts.
-  const DEFAULT_SEQ = L.timeline.map((x) => x[0]);
-  const DEFAULT_TIMES = L.timeline.map((x) => x[1]);
+  // every library entry, with its category's language, by id (the text key, or "n<number>")
+  const ITEMS = {};
+  LIB.forEach((cat) => cat.items.forEach((it) => {
+    it.lang = cat.lang; it.cat = cat;
+    it.id = it.text || `n${it.n}`;
+    it.available = !!(it.text && TEXTS[it.text] && it.youtube);
+    ITEMS[it.id] = it;
+  }));
+  const DEFAULT_ID = 'mummanikkovai';
 
   // settings live in the Electron main process; fall back to localStorage when opened in a plain browser
   const store = window.widget || {
@@ -19,9 +25,14 @@
     onFullscreenChanged: (fn) => document.addEventListener('fullscreenchange', () => fn(!!document.fullscreenElement)),
   };
 
-  const S = { opacity: 0.55, font: 1, offset: 0, video: false, loop: true, timings: null, seq: null };
-  let seq = DEFAULT_SEQ.slice();
-  let times = DEFAULT_TIMES.slice();
+  // S.slokams[id] = { seq, timings, offset } — synced timings and offset, per slokam
+  const S = { opacity: 0.55, font: 1, video: false, loop: true, current: DEFAULT_ID, slokams: {} };
+
+  // The slokam on screen. Playback follows a *timeline*: every recited line in the order the
+  // recording says it, so repeated verses appear more than once. seq[e] is the line shown for
+  // timeline entry e and times[e] is when it starts.
+  let item = null, T = null;
+  let seq = [], times = [], estimatedFor = null; // estimatedFor = duration the estimates were made for (null when synced)
   let player = null;
   let entry = -2;       // current timeline entry
   let activeLine = -2;  // line currently highlighted
@@ -29,18 +40,21 @@
   let sync = null;      // { next, marks: [time | null (skipped)] } while in sync mode
 
   // ---------- helpers ----------
-  const fmt = (s) => { s = Math.max(0, Math.floor(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
-  const t0 = (e) => times[e] + S.offset;
+  const fmt = (s) => { s = Math.max(0, Math.floor(s || 0)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+  const mine = () => (S.slokams[item.id] = S.slokams[item.id] || {});
+  const offset = () => mine().offset || 0;
+  const t0 = (e) => times[e] + offset();
   function entryAt(t) {
     let lo = 0, hi = times.length - 1, ans = -1;
     while (lo <= hi) { const m = (lo + hi) >> 1; if (t0(m) <= t) { ans = m; lo = m + 1; } else hi = m - 1; }
     return ans;
   }
-  // true if timeline entry e is a repeat of a line already recited earlier
-  const isRepeat = (e, s = seq) => s.slice(0, e).includes(s[e]);
+  const isRepeat = (e) => seq.slice(0, e).includes(seq[e]); // a line already recited earlier
   function label(e) {
     if (e < 0 || e >= seq.length) return '';
-    return `பாசுரம் ${L.lines[seq[e]].v} / 10` + (isRepeat(e) ? ' · மீண்டும்' : '');
+    const v = T.lines[seq[e]].v;
+    const name = (T.labels && T.labels[v]) || `${T.verseWord} ${v} / ${T.verseCount}`;
+    return name + (isRepeat(e) ? ' · ' + REPEAT_WORD[item.lang] : '');
   }
   let toastTimer;
   function toast(msg, ms = 3500) {
@@ -48,17 +62,43 @@
     clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.add('hidden'), ms);
   }
   function save(patch) { Object.assign(S, patch); store.setSettings(patch); }
+  const saveMine = (patch) => { Object.assign(mine(), patch); save({ slokams: S.slokams }); };
+
+  // default playback order: each verse in `order`, all of its lines
+  const defaultSeq = () => T.order.flatMap((v) => T.lines.map((l, i) => (l.v === v ? i : -1)).filter((i) => i >= 0));
+
+  // Estimated start times, spread over the recording by how many letters each line has,
+  // with a short pause between verses. Sync mode replaces these with exact ones.
+  function estimate(s, dur) {
+    const letters = (txt) => (txt.match(/\p{L}/gu) || []).length;
+    const gap = (k) => (k > 0 && s[k] !== s[k - 1] + 1 ? 8 : 0);
+    const w = s.map((i, k) => letters(T.lines[i].text) + 3 + gap(k));
+    const start = Math.min(3, dur * 0.01), end = dur - Math.min(6, dur * 0.015);
+    const scale = (end - start) / w.reduce((a, b) => a + b, 0);
+    let t = start;
+    return s.map((i, k) => { t += gap(k) * scale; const at = t; t += (w[k] - gap(k)) * scale; return Math.round(at * 100) / 100; });
+  }
+  const knownDuration = () => (player && player.duration() > 1 ? player.duration() : item.duration || 600);
+
+  function loadTimings() {
+    const m = mine();
+    const ok = Array.isArray(m.timings) && Array.isArray(m.seq) && m.timings.length === m.seq.length && m.seq.length > 0
+      && m.seq.every((i) => Number.isInteger(i) && i >= 0 && i < T.lines.length);
+    if (ok) { seq = m.seq.slice(); times = m.timings.slice(); estimatedFor = null; }
+    else { seq = defaultSeq(); const d = knownDuration(); times = estimate(seq, d); estimatedFor = d; }
+  }
 
   // ---------- render lyrics ----------
-  const lis = [];
+  let lis = [];
   function buildLines() {
-    const ol = $('lines'); ol.innerHTML = '';
-    L.lines.forEach((ln, i) => {
+    const ol = $('lines'); ol.innerHTML = ''; lis = [];
+    ol.lang = item.lang;
+    T.lines.forEach((ln, i) => {
       const li = document.createElement('li');
       li.className = 'line';
-      if (i === 0 || L.lines[i - 1].v !== ln.v) {
+      if (i === 0 || T.lines[i - 1].v !== ln.v) {
         li.classList.add('verse-start');
-        li.dataset.verse = ln.v;
+        li.dataset.verse = (T.labels && T.labels[ln.v]) || ln.v;
       }
       // inline span: when a line wraps, its background is laid out as one continuous strip,
       // so the highlight sweeps the first row and then the second instead of both at once
@@ -98,7 +138,7 @@
       li.classList.toggle('past', k < line); // on a repeat, lines after it light back up as "to come"
     });
     $('verseLabel').textContent = label(e);
-    $('pillText').textContent = line < 0 ? L.title : L.lines[line].text;
+    $('pillText').textContent = line < 0 ? item.native : T.lines[line].text;
     if (changed && performance.now() > userScrollUntil) {
       const target = scrollLine ?? line;
       scrollToLine(target, Math.abs(target - prevLine) < 14);
@@ -106,10 +146,18 @@
   }
 
   // ---------- main loop ----------
+  let adShown = false;
   function tick() {
-    if (player) {
+    if (player && item) {
       const t = player.time();
       const dur = player.duration();
+      // estimates were spread over a guessed length: redo them once the real length is known
+      if (estimatedFor != null && dur > 1 && Math.abs(dur - estimatedFor) > 1 && !sync) {
+        times = estimate(seq, dur); estimatedFor = dur; entry = -2;
+      }
+      const ad = player.adPlaying && player.adPlaying();
+      if (ad && !adShown) toast('An ad is playing on YouTube — the lyrics will continue when it ends.', 6000);
+      adShown = ad;
       if (sync && !player.playing() && t >= dur - 0.5) finishSync(); // recording ended mid-sync
       if (sync) {
         const targetLine = seq[sync.next];
@@ -132,7 +180,7 @@
       if (player.playing() !== document.body.classList.contains('playing')) updatePlayButtons();
       $('time').textContent = fmt(t);
       $('duration').textContent = fmt(dur);
-      $('progressFill').style.width = (100 * t / dur).toFixed(2) + '%';
+      $('progressFill').style.width = (dur > 0 ? (100 * t / dur) : 0).toFixed(2) + '%';
     }
     requestAnimationFrame(tick);
   }
@@ -158,6 +206,7 @@
   // Walks the timeline in playback order (repeats included). Space marks the start of the
   // highlighted line; S skips it if the recording doesn't actually say it there.
   function startSync() {
+    if (!player) return;
     closeSheet();
     sync = { next: 0, marks: [], shown: -1 };
     document.body.classList.add('syncing');
@@ -190,12 +239,12 @@
     // replay from the start of the last kept line so the redone mark lands after it
     if (wasMark) player.seek(lastMark() ?? 0);
   }
-  function finishSync() {
+  function finishSync(discard) {
     if (!sync) return;
     const n = sync.marks.length;
     const total = seq.length;
     const skipped = sync.marks.filter((m) => m == null).length;
-    if (n > 0) {
+    if (n > 0 && !discard) {
       const newSeq = [], newTimes = [];
       let delta = 0;
       for (let k = 0; k < n; k++) {
@@ -207,7 +256,8 @@
       for (let k = n; k < seq.length; k++) { newSeq.push(seq[k]); newTimes.push(t0(k) + delta); }
       seq = newSeq;
       times = newTimes.map((t) => Math.round(t * 100) / 100);
-      save({ timings: times, seq, offset: 0 });
+      estimatedFor = null;
+      saveMine({ timings: times, seq, offset: 0 });
       $('offVal').textContent = '0.0s';
       toast((n === total ? 'Timings saved for every line ✓' : `Saved ${n} of ${total} lines — run Sync again later to finish.`)
         + (skipped ? ` Skipped ${skipped} line${skipped > 1 ? 's' : ''} not in the recording.` : ''));
@@ -217,7 +267,7 @@
     $('syncBanner').classList.add('hidden');
     lis.forEach((li) => li.classList.remove('target'));
     entry = -2;
-    player.loop = !!S.loop;
+    if (player) player.loop = !!S.loop;
     updateTimingNote();
   }
 
@@ -226,22 +276,67 @@
     document.documentElement.style.setProperty('--bg-a', S.opacity);
     document.documentElement.style.setProperty('--scale', S.font);
     document.body.classList.toggle('show-video', !!S.video);
-    $('offVal').textContent = (S.offset >= 0 ? '+' : '') + S.offset.toFixed(1) + 's';
-    if (player) player.loop = !!S.loop && !sync;
+    if (item) $('offVal').textContent = (offset() >= 0 ? '+' : '') + offset().toFixed(1) + 's';
+    if (player) {
+      player.loop = !!S.loop && !sync;
+      if (player.show) player.show(!!S.video);
+    }
     entry = -2; // refresh pill text
   }
   function updateTimingNote() {
-    $('timingNote').textContent = S.timings
-      ? 'Using your synced timings.'
-      : 'Timings are estimates. Use “Sync timings” once — tap Space as each line begins — to make them exact.';
+    $('timingNote').textContent = estimatedFor == null
+      ? `Using your synced timings for ${item.iast}.`
+      : `Timings for ${item.iast} are estimates. Use “Sync timings” once — tap Space as each line begins — to make them exact.`;
   }
   function openSheet() {
+    closeLibrary();
     $('optOpacity').value = S.opacity; $('optFont').value = S.font; $('optVideo').checked = !!S.video; $('optLoop').checked = !!S.loop;
     updateTimingNote();
     $('sheet').classList.remove('hidden');
   }
   function closeSheet() { $('sheet').classList.add('hidden'); }
 
+  // ---------- library menu ----------
+  function buildLibrary() {
+    const list = $('libList'); list.innerHTML = '';
+    LIB.forEach((cat) => {
+      // each category in its own section, so its sticky heading only stays pinned while it's in view
+      const sec = document.createElement('section');
+      sec.className = 'lib-section';
+      list.appendChild(sec);
+      const h = document.createElement('div');
+      h.className = 'lib-cat';
+      // Tamil works: Tamil first, IAST under it; Sanskrit works: IAST first, Devanagari under it
+      const [main, sub] = cat.lang === 'ta' ? [cat.native, cat.iast] : [cat.iast, cat.native];
+      h.innerHTML = `<span class="lib-main"></span><span class="lib-sub"></span>`;
+      h.children[0].textContent = main; h.children[1].textContent = sub;
+      h.children[cat.lang === 'ta' ? 0 : 1].lang = cat.lang;
+      sec.appendChild(h);
+      cat.items.forEach((it) => {
+        const b = document.createElement('button');
+        b.className = 'lib-item' + (it.available ? '' : ' soon') + (item && it.id === item.id ? ' current' : '');
+        b.disabled = !it.available;
+        const [m, s] = cat.lang === 'ta' ? [it.native, it.iast] : [it.iast, it.native];
+        b.innerHTML = '<span class="lib-n"></span><span class="lib-names"><span class="lib-main"></span><span class="lib-sub"></span></span><span class="lib-tag"></span>';
+        b.querySelector('.lib-n').textContent = it.n;
+        b.querySelector('.lib-main').textContent = m;
+        b.querySelector('.lib-sub').textContent = s;
+        b.querySelector(cat.lang === 'ta' ? '.lib-main' : '.lib-sub').lang = cat.lang;
+        b.querySelector('.lib-tag').textContent = it.available ? (item && it.id === item.id ? '♪' : '') : 'soon';
+        if (it.available) b.onclick = () => { closeLibrary(); selectSlokam(it.id); };
+        sec.appendChild(b);
+      });
+    });
+  }
+  function openLibrary() {
+    closeSheet(); buildLibrary();
+    $('library').classList.remove('hidden');
+    const cur = $('libList').querySelector('.current');
+    if (cur) cur.scrollIntoView({ block: 'center' });
+  }
+  function closeLibrary() { $('library').classList.add('hidden'); }
+
+  // ---------- full screen / compact ----------
   const isFull = () => document.body.classList.contains('fullscreen');
   function applyFullscreen(on) {
     document.body.classList.toggle('fullscreen', on);
@@ -265,20 +360,21 @@
     $('btnRestore').onclick = () => store.setCompact(false);
     $('pillText').ondblclick = () => store.setCompact(false);
     $('btnClose').onclick = () => store.hide();
+    $('btnLibrary').onclick = () => ($('library').classList.contains('hidden') ? openLibrary() : closeLibrary());
+    $('btnLibClose').onclick = closeLibrary;
     $('btnSettings').onclick = () => ($('sheet').classList.contains('hidden') ? openSheet() : closeSheet());
     $('btnSheetClose').onclick = closeSheet;
     $('optOpacity').oninput = (e) => { save({ opacity: +e.target.value }); applyLook(); };
     $('optFont').oninput = (e) => { save({ font: +e.target.value }); applyLook(); };
     $('optVideo').onchange = (e) => { save({ video: e.target.checked }); applyLook(); };
     $('optLoop').onchange = (e) => { save({ loop: e.target.checked }); applyLook(); };
-    $('offMinus').onclick = () => { save({ offset: Math.round((S.offset - 0.5) * 10) / 10 }); applyLook(); };
-    $('offPlus').onclick = () => { save({ offset: Math.round((S.offset + 0.5) * 10) / 10 }); applyLook(); };
+    $('offMinus').onclick = () => { saveMine({ offset: Math.round((offset() - 0.5) * 10) / 10 }); applyLook(); };
+    $('offPlus').onclick = () => { saveMine({ offset: Math.round((offset() + 0.5) * 10) / 10 }); applyLook(); };
     $('btnSync').onclick = startSync;
     $('btnMark').onclick = mark;
     $('btnSkip').onclick = skip;
     $('btnReset').onclick = () => {
-      seq = DEFAULT_SEQ.slice(); times = DEFAULT_TIMES.slice();
-      save({ timings: null, seq: null, offset: 0 }); applyLook(); updateTimingNote();
+      saveMine({ timings: null, seq: null, offset: 0 }); loadTimings(); applyLook(); updateTimingNote();
       toast('Timings reset to the built-in estimates.');
     };
     $('btnQuit').onclick = () => store.quit();
@@ -307,8 +403,10 @@
         case 'ArrowRight': player && player.seek(player.time() + 5); break;
         case 'KeyM': store.setCompact(!document.body.classList.contains('compact')); break;
         case 'KeyF': toggleFullscreen(); break;
+        case 'KeyL': $('btnLibrary').click(); break;
         case 'Escape':
           if (!$('sheet').classList.contains('hidden')) closeSheet();
+          else if (!$('library').classList.contains('hidden')) closeLibrary();
           else if (isFull()) store.setFullscreen(false);
           break;
       }
@@ -318,37 +416,90 @@
     store.onCommand((cmd) => { if (cmd === 'toggle-play') togglePlay(); });
   }
 
-  // ---------- player ----------
+  // ---------- players ----------
+  let loadToken = 0, ytTimeout = null;
+  const ytApiReady = () => !!(window.YT && window.YT.Player);
   function onLoop() { entry = -2; userScrollUntil = 0; }
+  function adopt(p) {
+    player = p;
+    p.onState = updatePlayButtons; p.onLoop = onLoop; p.loop = !!S.loop && !sync;
+    updatePlayButtons();
+  }
+  function dropPlayer() {
+    clearTimeout(ytTimeout);
+    if (player) { try { player.pause(); } catch {} player.destroy && player.destroy(); }
+    player = null;
+    document.body.classList.remove('clock-mode', 'page-mode');
+    $('videoBox').innerHTML = '<div id="yt"></div>';
+    updatePlayButtons();
+  }
   function useClock(reason) {
-    if (player && player.kind === 'clock') return;
-    player = new ClockPlayer(L.duration);
-    player.onState = updatePlayButtons; player.onLoop = onLoop; player.loop = !!S.loop;
+    adopt(new ClockPlayer(item.duration || 1800));
     document.body.classList.add('clock-mode');
     toast(reason + ' Using a stopwatch instead: press ▶ at the same moment you start the video.', 9000);
   }
-  let ytTimeout = setTimeout(() => useClock('Couldn’t reach YouTube.'), 10000);
-  window.onYouTubeIframeAPIReady = () => {
-    if (player) return;
-    const yp = new YouTubePlayer('yt', L.videoId, L.duration, {
-      onReady: () => { clearTimeout(ytTimeout); player = yp; yp.onState = updatePlayButtons; yp.onLoop = onLoop; yp.loop = !!S.loop && !sync; },
+  function usePage(token) {
+    if (token !== loadToken) return;
+    document.body.classList.add('page-mode');
+    adopt(new PagePlayer(window.widget.ytPage, item.youtube, item.duration || 0, {
+      show: !!S.video,
+      onNeedsUser: () => toast('YouTube is showing a page that needs a click (sign-in or cookies). It’s open in a separate window.', 9000),
+    }));
+    toast('This video can’t be embedded, so it’s playing from the YouTube page in the background. Turn on “Show video” to see it.', 6000);
+  }
+  function loadPlayer() {
+    const token = ++loadToken;
+    dropPlayer();
+    if (!ytApiReady()) {
+      ytTimeout = setTimeout(() => { if (token === loadToken && !player) useClock('Couldn’t reach YouTube.'); }, 10000);
+      return; // onYouTubeIframeAPIReady calls back here
+    }
+    ytTimeout = setTimeout(() => { if (token === loadToken && !player) useClock('YouTube didn’t respond.'); }, 15000);
+    const yp = new YouTubePlayer('yt', item.youtube, item.duration || 0, {
+      onReady: () => { if (token !== loadToken) return; clearTimeout(ytTimeout); adopt(yp); },
       onError: (code) => {
+        if (token !== loadToken) return;
         clearTimeout(ytTimeout);
-        if (!player || player === yp) { player = null; useClock(`YouTube can’t play the video here (error ${code}).`); }
+        try { yp.destroy(); } catch {}
+        if (player === yp) player = null;
+        // 101 / 150 / 153: the uploader doesn't allow embedding — play the YouTube page instead
+        if ([101, 150, 152, 153].includes(code) && window.widget && window.widget.ytPage) usePage(token);
+        else useClock(`YouTube can’t play the video here (error ${code}).`);
       },
     });
-  };
+  }
+  window.onYouTubeIframeAPIReady = () => { if (item && !player) loadPlayer(); };
+
+  // ---------- choosing a slokam ----------
+  function selectSlokam(id) {
+    const it = ITEMS[id] && ITEMS[id].available ? ITEMS[id] : ITEMS[DEFAULT_ID];
+    if (sync) finishSync(true);
+    item = it; T = TEXTS[it.text];
+    save({ current: it.id });
+    document.body.dataset.lang = it.lang;
+    $('slokaTitle').textContent = it.native;
+    $('slokaTitle').lang = it.lang;
+    $('slokaTitle').title = it.iast;
+    loadTimings();
+    buildLines();
+    entry = -2; activeLine = -2;
+    setEntry(-1);
+    $('viewport').scrollTop = 0;
+    applyLook();
+    loadPlayer();
+  }
 
   // ---------- start ----------
   (async () => {
     Object.assign(S, await store.getSettings());
-    const ok = Array.isArray(S.timings) && Array.isArray(S.seq) && S.timings.length === S.seq.length && S.seq.length > 0
-      && S.seq.every((i) => Number.isInteger(i) && i >= 0 && i < L.lines.length);
-    if (ok) { seq = S.seq.slice(); times = S.timings.slice(); } else { S.timings = null; S.seq = null; }
-    buildLines();
+    S.slokams = S.slokams || {};
+    // settings from before the library existed belonged to Mummanikkovai
+    if (S.timings || S.seq || S.offset) {
+      if (!S.slokams.mummanikkovai) S.slokams.mummanikkovai = { timings: S.timings, seq: S.seq, offset: S.offset || 0 };
+      save({ slokams: S.slokams, timings: null, seq: null, offset: null });
+    }
     bind();
-    applyLook();
-    setEntry(-1);
+    selectSlokam(S.current || DEFAULT_ID);
     requestAnimationFrame(tick);
   })();
 })();
