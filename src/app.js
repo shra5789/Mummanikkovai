@@ -147,6 +147,7 @@
 
   // ---------- main loop ----------
   let adShown = false;
+  let wasPlaying = false;
   function tick() {
     if (player && item) {
       const t = player.time();
@@ -159,6 +160,14 @@
       if (ad && !adShown) toast('An ad is playing on YouTube — the lyrics will continue when it ends.', 6000);
       adShown = ad;
       if (sync && !player.playing() && t >= dur - 0.5) finishSync(); // recording ended mid-sync
+      // with looping off, a slokam that plays to the end is followed by the next one
+      const nowPlaying = player.playing();
+      if (wasPlaying && !nowPlaying && !sync && !S.loop && dur > 1 && t >= dur - 1) {
+        wasPlaying = false;
+        stepTrack(1, true);
+        return requestAnimationFrame(tick);
+      }
+      wasPlaying = nowPlaying;
       if (sync) {
         const targetLine = seq[sync.next];
         if (sync.shown !== sync.next) {
@@ -475,10 +484,10 @@
   // ---------- choosing a slokam ----------
   // ⏮ / ⏭ step through the playable slokams in menu order, wrapping around at the ends
   const PLAYABLE = Object.values(ITEMS).filter((it) => it.available).sort((a, b) => a.n - b.n);
-  function stepTrack(d) {
+  function stepTrack(d, play) {
     const k = PLAYABLE.findIndex((it) => it.id === item.id);
     const next = PLAYABLE[(k + d + PLAYABLE.length) % PLAYABLE.length];
-    selectSlokam(next.id, { play: !!(player && player.playing()) });
+    selectSlokam(next.id, { play: play ?? !!(player && player.playing()) });
   }
   const nextTrack = () => stepTrack(1);
   function prevTrack() {

@@ -225,3 +225,5 @@ body.fullscreen.show-video .video-box { top: 76px; right: 28px; width: 320px; he
 body.fullscreen .library { inset: 70px auto 70px 50%; transform: translateX(-50%); width: min(460px, 90vw); }
 body.compact .library { display: none !important; }
 body.page-mode .video-box { display: none; }
+
+.sheet .hint { opacity: .55; font-size: 10.5px; margin-left: 4px; }

@@ -39,7 +39,8 @@ Taniyans are included wherever prapatti.com prints them. If a recording leaves o
   Press `F` or `Esc` (or the `🗗` button) to go back to the small widget.
 - **Minimize** (`–` or `M`) shrinks it to a slim pill that shows only the current line. Click `⤢` to expand it again.
 - **×** hides it to the system tray. Bring it back from the tray icon or with **Ctrl + Alt + L**.
-- **Loops** the recitation and starts again from the beginning when it ends. You can turn this off in ⚙.
+- **Loops** the recitation and starts again from the beginning when it ends. Turn looping off in ⚙ and
+  it moves on to the next slokam in the menu instead, playing them one after another.
 - Settings for background transparency, text size, a timing offset, showing the video, and *Start with Windows* (in the tray menu).
 
 ## Get it
