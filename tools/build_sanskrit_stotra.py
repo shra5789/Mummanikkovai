@@ -20,6 +20,8 @@ ap = argparse.ArgumentParser()
 ap.add_argument('pdf'); ap.add_argument('id')
 ap.add_argument('--prakrit', action='store_true', help='Prakrit work: keep the Prakrit, drop each Sanskrit chāyā')
 ap.add_argument('--gadyam', action='store_true', help='prose work (Raghuvīra Gadyam): "!"-phrases grouped by kāṇḍa')
+ap.add_argument('--revision', type=int, default=1,
+                help='bump when the lines or order change, so the app drops timings synced to the old ones')
 ARGS = ap.parse_args()
 
 # ---- extract PDF lines. Rebuild each page's lines from all its characters by vertical position:
@@ -148,7 +150,13 @@ labels = {k: (dev(v[6:]) if v.startswith('KANDA:') else v) for k, v in labels.it
 verses = sorted({o['v'] for o in out if o['v'] not in (0, closing)})
 numbered = [v for v in verses if v not in appendix]
 first, last = numbered[0], numbered[-1]
-order = [0] + [v for v in verses for _ in range(2 if v in (first, last) else 1)] + ([closing] if closing else [])
+twice = {first, last}
+if ARGS.gadyam:
+    # Raghuvīra Gadyam: both closing ślōkas after the last kāṇḍa (caturmukhēśvara … and
+    # kavikathakasiṃha …) are chanted twice
+    last_kanda = max(k for k, v in labels.items() if v.startswith('KANDA:') or 'काण्ड' in v)
+    twice |= {v for v in verses if v > last_kanda}
+order = [0] + [v for v in verses for _ in range(2 if v in twice else 1)] + ([closing] if closing else [])
 if not ARGS.gadyam:
     labels = {k: v for k, v in labels.items() if v == 'तनियन्' or k in appendix}
 
@@ -158,6 +166,8 @@ print('// converted to Devanagari). v = %s; 0 = opening taniyan, %s = closing ta
 print('// order: in the order they are chanted (the first and last ślōkas are said twice).')
 print('window.SLOKAM_TEXTS = window.SLOKAM_TEXTS || {};')
 print('window.SLOKAM_TEXTS[%s] = {' % json.dumps(ARGS.id))
+if ARGS.revision > 1:
+    print('  revision: %d,' % ARGS.revision)
 print('  verseWord: "श्लोकः", verseCount: %d, labels: %s,' % (len(numbered), json.dumps({str(k): v for k, v in labels.items()}, ensure_ascii=False)))
 print('  order: %s,' % json.dumps(order))
 print('  lines: [')
