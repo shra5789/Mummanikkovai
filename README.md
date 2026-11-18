@@ -68,11 +68,14 @@ a recording: nīrāṭṭam (4), vāraṇamāyiram (11), aṅgaṇ ñālam (13),
 ## Features
 
 - **Floats above other windows** and stays put. It's frameless and see-through, and you can drag it anywhere by its title bar.
-- **Spotify-style lyrics:** the current line fills in with a white sweep (row by row when it wraps), past lines dim, and clicking any line jumps the recitation there.
+- **Spotify-style lyrics:** the current line lights up, past lines dim, and clicking any line jumps the recitation there.
 - **Seek** by dragging the dot on the progress line, or clicking anywhere on it.
+- **Shuffle** (⇄): ⏭, and the next slokam after one ends (with looping off), are picked at random; ⏮ goes back
+  through the ones you've played.
 - **Follows the repeats.** When a verse is chanted a second time, the highlight jumps back to it and the header
   shows *மீண்டும்* (Tamil) or *पुनः* (Sanskrit). See [Repeats](#repeats).
-- **Full screen** (`⛶` or `F`) fills the screen with large, centred lyrics on a dark backdrop.
+- **Full screen** (`⛶` or `F`) fills the screen with large, centred lyrics on a solid dark background. It's an
+  ordinary window there (not kept on top), so you can switch to other windows.
   Press `F` or `Esc` (or the `🗗` button) to go back to the small widget.
 - **Minimize** (`–` or `M`) shrinks it to a slim pill that shows only the current line. Click `⤢` to expand it again.
 - **×** hides it to the system tray. Bring it back from the tray icon or with **Ctrl + Alt + L**.
@@ -126,7 +129,8 @@ If everything is consistently a bit early or late, use **Timing offset** (±0.5 
 - **Andādis** (Irāmānuśa Nūṟṟandādi, Piḷḷai Andādi, Kaṇṇinuṇ Śiṟuttāmbu): after the last pāsuram, pāsuram 1 is
   chanted once more, and the lyrics jump back to it.
 - **Sanskrit Dēśika stōtras:** the first and last ślōkas are chanted twice. For Dayāśatakam that's ślōkas 1 and 108.
-  Garuḍa Daṇḍakam repeats its first ślōka and its last two.
+  Garuḍa Daṇḍakam and Kāmāsikāṣṭakam repeat their first ślōka and their last two.
+- **Tirupallāṇḍu:** the PDF's pāsurams 1 and 2 are shown as one pāsuram 1, so it has 11.
 - **Vēdam:** nothing is repeated.
 
 The text generators in `tools/` apply these rules when they build each slokam's playback order.

@@ -154,9 +154,11 @@ function setFullscreen(on) {
     win.setResizable(false);
     win.setMinimumSize(1, 1);
     win.setBounds(bounds);
+    win.setAlwaysOnTop(false);   // full screen behaves like a normal window you can switch away from
     win.show(); win.focus();
   } else {
     fullscreen = false;
+    if (settings.alwaysOnTop !== false) win.setAlwaysOnTop(true, 'screen-saver');
     win.setResizable(true);
     win.setMinimumSize(260, 140);
     win.setBounds(visibleBounds(beforeFullscreen || settings.bounds || { ...FULL_DEFAULT, x: 100, y: 100 }));
@@ -167,7 +169,7 @@ function setFullscreen(on) {
 
 function toggleVisible() {
   if (!win) return;
-  if (win.isVisible()) win.hide(); else { win.show(); win.setAlwaysOnTop(true, 'screen-saver'); }
+  if (win.isVisible()) win.hide(); else { win.show(); if (!fullscreen && settings.alwaysOnTop !== false) win.setAlwaysOnTop(true, 'screen-saver'); }
   rebuildTrayMenu();
 }
 

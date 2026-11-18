@@ -88,12 +88,8 @@ body.playing:not(:hover) .controls { opacity: 0; }
 /* karaoke sweep: --p advances from 0% to 100% across the line's duration. The span is inline
    with box-decoration-break: slice, so a wrapped line's rows share one gradient laid end to end
    and fill one after the other, in reading order. */
-.line.active .txt {
-  color: transparent;
-  background-image: linear-gradient(90deg, #fff 0 var(--p, 0%), rgba(var(--fg), .55) var(--p, 0%) 100%);
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-box-decoration-break: slice; box-decoration-break: slice;
-}
+/* the whole current line lights up at once */
+.line.active .txt { color: #fff; }
 .line.active:hover { background-color: transparent; }
 .line.verse-start { margin-top: calc(14px * var(--scale)); position: relative; }
 .line.verse-start::before {
@@ -122,6 +118,9 @@ kbd { font: inherit; font-size: 10px; padding: 0 4px; border-radius: 4px; backgr
 .progress::before { content: ""; position: absolute; left: 0; right: 0; height: 3px; border-radius: 3px; background: rgba(var(--fg), .2); }
 .progress .fill { position: relative; height: 3px; border-radius: 3px; background: rgba(var(--fg), .85); width: 0; }
 .progress:hover .fill, .progress.dragging .fill { background: var(--accent); }
+/* shuffle button: gold when on */
+#btnShuffle { opacity: .45; font-size: 15px; }
+#btnShuffle.on { opacity: 1; color: var(--accent); }
 /* the seek dot at the playback position */
 .progress .knob {
   position: absolute; top: 50%; left: 0; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px;
@@ -183,9 +182,10 @@ body.compact .video-box { left: -10000px; }
 body.clock-mode .video-box { display: none; }
 
 /* ---------- full screen ---------- */
+/* full screen is an ordinary window with a solid background, not a see-through overlay */
 body.fullscreen .panel {
   border-radius: 0; border: 0;
-  background: rgba(8, 7, 12, max(var(--bg-a), .9));
+  background: rgb(14, 12, 18);
 }
 body.fullscreen .bar { -webkit-app-region: no-drag; padding: 18px 22px 6px 32px; }
 body.fullscreen .app-name { font-size: 17px; }

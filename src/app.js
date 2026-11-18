@@ -53,6 +53,8 @@
   // Tamil works mark a verse that is chanted more than once with ↻ beside its number
   // (Sanskrit works don't get the mark)
   const REPEAT_MARK = '↻';
+  // the number shown for a verse (texts can show two printed verses as one, e.g. Tirupallāṇḍu 1)
+  const shownNum = (v) => (T.num && T.num[v] != null ? T.num[v] : v);
   function chantedAgain(v) {
     if (item.lang !== 'ta' || !(v > 0)) return false;
     const firstLine = T.lines.findIndex((l) => l.v === v);
@@ -61,7 +63,7 @@
   function label(e) {
     if (e < 0 || e >= seq.length) return '';
     const v = T.lines[seq[e]].v;
-    const num = chantedAgain(v) ? `${v} ${REPEAT_MARK}` : v;
+    const num = chantedAgain(v) ? `${shownNum(v)} ${REPEAT_MARK}` : shownNum(v);
     const name = (T.labels && T.labels[v]) || `${T.verseWord} ${num} / ${T.verseCount}`.trim();
     return name + (isRepeat(e) ? ' · ' + REPEAT_WORD[item.lang] : '');
   }
@@ -115,7 +117,7 @@
     T.lines.forEach((ln, i) => {
       const li = document.createElement('li');
       li.className = 'line';
-      if (i === 0 || T.lines[i - 1].v !== ln.v) {
+      if (i === 0 || (T.lines[i - 1].v !== ln.v && (ln.v < 0 || shownNum(T.lines[i - 1].v) !== shownNum(ln.v)))) {
         li.classList.add('verse-start');
         li.dataset.v = ln.v;
       }
@@ -141,7 +143,7 @@
     lis.forEach((li) => {
       if (li.dataset.v === undefined) return;
       const v = +li.dataset.v;
-      const base = (T.labels && T.labels[v]) || v;
+      const base = (T.labels && T.labels[v]) || shownNum(v);
       li.dataset.verse = chantedAgain(v) ? `${base} ${REPEAT_MARK}` : base;
     });
   }
@@ -400,6 +402,7 @@
   function bind() {
     $('btnPlay').onclick = togglePlay; $('pillPlay').onclick = togglePlay;
     $('btnPrev').onclick = () => prevTrack(); $('btnNext').onclick = () => nextTrack();
+    $('btnShuffle').onclick = () => { save({ shuffle: !S.shuffle }); applyShuffle(); toast(S.shuffle ? 'Shuffle on: ⏭ and the next slokam after one ends are picked at random.' : 'Shuffle off.', 2500); };
     $('btnMin').onclick = () => store.setCompact(true);
     $('btnFull').onclick = toggleFullscreen;
     $('btnRestore').onclick = () => store.setCompact(false);
@@ -541,10 +544,21 @@
   // ---------- choosing a slokam ----------
   // ⏮ / ⏭ step through the playable slokams in menu order, wrapping around at the ends
   const PLAYABLE = Object.values(ITEMS).filter((it) => it.available).sort((a, b) => a.n - b.n);
+  // With shuffle on, "next" is a random other slokam, and "previous" walks back through the ones played.
+  const history = [];
   function stepTrack(d, play) {
-    const k = PLAYABLE.findIndex((it) => it.id === item.id);
-    const next = PLAYABLE[(k + d + PLAYABLE.length) % PLAYABLE.length];
-    selectSlokam(next.id, { play: play ?? !!(player && player.playing()) });
+    const keepPlaying = play ?? !!(player && player.playing());
+    let next;
+    if (S.shuffle && d > 0) {
+      const others = PLAYABLE.filter((it) => it.id !== item.id);
+      next = others[Math.floor(Math.random() * others.length)];
+    } else if (S.shuffle && d < 0 && history.length) {
+      return selectSlokam(history.pop(), { play: keepPlaying, back: true });
+    } else {
+      const k = PLAYABLE.findIndex((it) => it.id === item.id);
+      next = PLAYABLE[(k + d + PLAYABLE.length) % PLAYABLE.length];
+    }
+    selectSlokam(next.id, { play: keepPlaying });
   }
   const nextTrack = () => stepTrack(1);
   function prevTrack() {
@@ -552,8 +566,13 @@
     if (player && player.time() > 3) { player.seek(0); userScrollUntil = 0; entry = -2; }
     else stepTrack(-1);
   }
+  function applyShuffle() {
+    $('btnShuffle').classList.toggle('on', !!S.shuffle);
+    $('btnShuffle').title = S.shuffle ? 'Shuffle is on' : 'Shuffle is off';
+  }
 
-  function selectSlokam(id, { play = false } = {}) {
+  function selectSlokam(id, { play = false, back = false } = {}) {
+    if (item && !back && id !== item.id) { history.push(item.id); if (history.length > 50) history.shift(); }
     const it = ITEMS[id] && ITEMS[id].available ? ITEMS[id] : ITEMS[DEFAULT_ID];
     if (sync) finishSync(true);
     item = it; T = TEXTS[it.text];
@@ -582,6 +601,7 @@
       save({ slokams: S.slokams, timings: null, seq: null, offset: null });
     }
     bind();
+    applyShuffle();
     selectSlokam(S.current || DEFAULT_ID);
     requestAnimationFrame(tick);
   })();
