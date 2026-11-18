@@ -82,7 +82,10 @@ def flush(group, verse):
     # because the PDF leaves some of its daṇḍa glyphs out of the text layer.
     for idx, raw in enumerate(group):
         end = '॥' if idx == len(group) - 1 else ('।' if idx == len(group) // 2 - 1 else '')
-        units.append({'v': verse, 'text': clean(raw), 'end': end})
+        text = clean(raw)
+        if text.endswith('-'):
+            end = ''   # a word running on into the next line never takes a daṇḍa (Garuḍa Daṇḍakam)
+        units.append({'v': verse, 'text': text, 'end': end})
 
 if ARGS.gadyam:
     # Prose: phrases end with "!" and run over several PDF lines, under kāṇḍa headings. The

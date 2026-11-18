@@ -10,7 +10,7 @@
   LIB.forEach((cat) => cat.items.forEach((it) => {
     it.lang = cat.lang; it.cat = cat;
     it.id = it.text || `n${it.n}`;
-    it.available = !!(it.text && TEXTS[it.text] && it.youtube);
+    it.available = !!(it.text && TEXTS[it.text] && (it.youtube || it.audio));
     ITEMS[it.id] = it;
   }));
   const DEFAULT_ID = 'mummanikkovai';
@@ -368,7 +368,7 @@
         b.querySelector('.lib-sub').textContent = s;
         b.querySelector('.lib-main').lang = cat.lang;
         b.querySelector('.lib-tag').textContent = it.available ? (item && it.id === item.id ? '♪' : '') : 'soon';
-        if (it.available) b.onclick = () => { closeLibrary(); selectSlokam(it.id); };
+        if (it.available) b.onclick = () => { closeLibrary(); selectSlokam(it.id, { play: true }); };
         sec.appendChild(b);
       });
     });
@@ -510,6 +510,14 @@
   function loadPlayer() {
     const token = ++loadToken;
     dropPlayer();
+    if (item.audio) {
+      // an MP3 recording (prapatti.com) instead of a YouTube video
+      const ap = new AudioPlayer(item.audio, item.duration || 0, {
+        onReady: () => { if (token === loadToken) adopt(ap); },
+        onError: (code) => { if (token === loadToken) { try { ap.destroy(); } catch {} useClock(`Couldn’t load the recording (error ${code}).`); } },
+      });
+      return;
+    }
     if (!ytApiReady()) {
       ytTimeout = setTimeout(() => { if (token === loadToken && !player) useClock('Couldn’t reach YouTube.'); }, 10000);
       return; // onYouTubeIframeAPIReady calls back here
@@ -528,7 +536,7 @@
       },
     });
   }
-  window.onYouTubeIframeAPIReady = () => { if (item && !player) loadPlayer(); };
+  window.onYouTubeIframeAPIReady = () => { if (item && !item.audio && !player) loadPlayer(); };
 
   // ---------- choosing a slokam ----------
   // ⏮ / ⏭ step through the playable slokams in menu order, wrapping around at the ends

@@ -2,6 +2,7 @@
 //  * YouTubePlayer — plays the recording through YouTube's embedded player (exact timing).
 //  * PagePlayer    — for videos whose uploader turned embedding off: the Electron main process
 //                    plays the normal YouTube page in its own window and reports the position.
+//  * AudioPlayer   — an MP3 file played directly.
 //  * ClockPlayer   — last-resort stopwatch if YouTube can't be reached; the user presses
 //                    play at the same moment they start the video elsewhere.
 // All expose: time(), duration(), playing(), play(), pause(), seek(sec), destroy(), and fire onState().
@@ -26,6 +27,30 @@ class ClockPlayer {
   pause() { if (this._startedAt != null) { this._base = this.time(); this._startedAt = null; this.onState(); } }
   seek(t) { this._base = Math.max(0, Math.min(t, this._dur)); if (this._startedAt != null) this._startedAt = performance.now(); this.onState(); }
   destroy() { this._startedAt = null; }
+}
+
+class AudioPlayer {
+  // a plain audio file (MP3), e.g. from prapatti.com/slokas/mp3/
+  constructor(url, duration, { onReady, onError }) {
+    this.kind = 'audio';
+    this._dur = duration; this.onState = () => {}; this.loop = true;
+    this.a = new Audio(); this.a.preload = 'auto'; this.a.src = url;
+    this.a.addEventListener('loadedmetadata', () => { if (this.a.duration) this._dur = this.a.duration; onReady && onReady(); }, { once: true });
+    this.a.addEventListener('error', () => onError && onError(this.a.error ? this.a.error.code : 0), { once: true });
+    this.a.addEventListener('play', () => this.onState());
+    this.a.addEventListener('pause', () => this.onState());
+    this.a.addEventListener('ended', () => {
+      if (this.loop) { this.a.currentTime = 0; this.a.play(); this.onLoop && this.onLoop(); }
+      else this.onState();
+    });
+  }
+  time() { return this.a.currentTime || 0; }
+  duration() { return this.a.duration || this._dur; }
+  playing() { return !this.a.paused && !this.a.ended; }
+  play() { const r = this.a.play(); if (r && r.catch) r.catch(() => {}); }
+  pause() { this.a.pause(); }
+  seek(t) { this.a.currentTime = Math.max(0, Math.min(t, this.duration() || t)); }
+  destroy() { this.a.pause(); this.a.removeAttribute('src'); this.a.load(); }
 }
 
 class PagePlayer {

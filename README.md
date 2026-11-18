@@ -5,7 +5,7 @@ scrolling line by line the way Spotify's lyrics view does.
 
 ## Slokams
 
-Press **☰** (or `L`) to choose a slokam. The menu has room for the full collection in four categories:
+Press **☰** (or `L`) to choose a slokam; it starts playing as soon as you pick it. The menu has room for the full collection in four categories:
 divya prabandaṅgaḷ, dēśika prabandaṅgaḷ, dēśika stōtramālā and vēdam. Each entry shows its original
 script (Tamil or Devanagari) with IAST underneath. Entries marked *soon* are placeholders for now.
 
@@ -23,7 +23,7 @@ Available now:
 | 9 | **கண்ணிநுண் சிறுத்தாம்பு** · kaṇṇinuṇ śiṟuttāmbu | 〃 | with taniyans |
 | 10 | **இராமாநுச நூற்றந்தாதி** · irāmānuśa nūṟṟandādi | [Maalola Kannan & N S Ranganathan](https://youtu.be/-PkD67xhHf0) | with taniyans |
 | 12 | **திருவெழுகூற்றிருக்கை** · tiruvezukūṟṟirukkai | [YouTube](https://youtu.be/5MPUwn8JafE) | one long pāsuram chanted twice, then the unnumbered closing verse |
-| 16 | **அடைக்கலப்பத்து** · aḍaikkalappattu | [YouTube](https://youtu.be/0v2QxDExoAU) | with Swami Dēśikan's taniyan |
+| 16 | **அடைக்கலப்பத்து** · aḍaikkalappattu | [YouTube](https://youtu.be/0v2QxDExoAU) | the pāsurams (the recording skips the taniyan) |
 | 17 | **மும்மணிக்கோவை** · mummaṇikkōvai | [Thiruvayindhai K. Malolakannan & N. S. Ranganathan](https://youtu.be/_S8ixInldNY) | the ten pāsurams |
 | 18 | **நவமணிமாலை** · navamaṇimālai | [YouTube](https://youtu.be/tNa-YkfeeGA) | the pāsurams (the recording skips the taniyans) |
 | 19 | **அதிகாரஸங்க்ரஹம்** · adikārasaṅgraham | [YouTube](https://youtu.be/HArjuc4zkPs) | the pāsurams (the recording skips the taniyan) |
@@ -33,9 +33,13 @@ Available now:
 | 23 | **மெய்விரதமான்மியம்** · meyviradamānmiyam | [YouTube](https://www.youtube.com/watch?v=fv3cNTJAc_Q) | with its own taniyan (the recording skips சீரொன்று தூப்புல்) |
 | 24 | **श्रीहयग्रीवस्तोत्रम्** · śrīhayagrīvastōtram | [Malola Kannan & N S Ranganathan](https://youtu.be/URLFjODqAoc) | with the opening and closing taniyan |
 | 25 | **श्रीदशावतारस्तोत्रम्** · śrīdaśāvatārastōtram | [Malola Kannan & N S Ranganathan](https://youtu.be/LeH3SspGN5w) | with the opening and closing taniyan |
+| 26 | **श्रीभगवद्ध्यानसोपानम्** · śrībhagavaddhyānasōpānam | [prapatti.com MP3](https://www.prapatti.com/slokas/mp3/bhagavaddhyaanasopaanam.mp3) | with the opening and closing taniyan |
 | 27 | **श्री अभीतिस्तवः** · śrī abhītistavaḥ | [Tiruvaindai Dr. K. Malolakannan](https://youtu.be/mPJXXUF_lnk) | with the opening and closing taniyan |
 | 28 | **श्रीदयाशतकम्** · śrīdayāśatakam | [Tiruvaindai Dr. K. Malolakannan](https://youtu.be/uFv0QOS2ROA) | with the opening and closing taniyan |
+| 29 | **श्रीवेगासेतुस्तोत्रम्** · śrīvēgāsētustōtram | [prapatti.com MP3](https://www.prapatti.com/slokas/mp3/vegaasetustotram.mp3) | with the opening and closing taniyan |
+| 30 | **श्री अष्टभुजाष्टकम्** · śrī aṣṭabhujāṣṭakam | [prapatti.com MP3](https://www.prapatti.com/slokas/mp3/ashtabhujaashtakam.mp3) | with the opening and closing taniyan |
 | 31 | **श्रीकामासिकाष्टकम्** · śrīkāmāsikāṣṭakam | [Malola Kannan & N S Ranganathan](https://youtu.be/zc0uAzv1B6Q) | with the opening and closing taniyan |
+| 32 | **श्रीपरमार्थस्तुतिः** · śrīparamārthastutiḥ | [prapatti.com MP3](https://www.prapatti.com/slokas/mp3/paramaarthastuti.mp3) | with the opening and closing taniyan |
 | 33 | **श्री अच्चुअसअअं** · śrī accuasaaam | [Tiruvaindai Dr. K. Malolakannan](https://youtu.be/aB1MQh0E678) | the Prakrit ślōkas (the PDF's Sanskrit chāyā is left out), with the taniyans |
 | 34 | **श्रीमहावीरवैभवम्** · raghuvīra gadyam | [Malola Kannan & N S Ranganathan](https://youtu.be/pz_T4_MqNOc) | prose, one phrase per line, by kāṇḍa |
 | 35 | **श्रीगोपालविंशतिः** · śrīgōpālaviṃśatiḥ | [Malola Kannan & N S Ranganathan](https://youtu.be/EIygjUa4xK8) | with the opening and closing taniyan |
@@ -45,6 +49,7 @@ Available now:
 | 39 | **श्रीन्यासदशकम्** · śrīnyāsadaśakam | [Tiruvaindai Dr. K. Malolakannan](https://youtu.be/92vJYEn0X9Y) | with the opening and closing taniyan |
 | 40 | **श्रीसुदर्शनाष्टकम्** · śrīsudarśanāṣṭakam | [Malola Kannan](https://youtu.be/rpd2QJeV54Y) | with the opening and closing taniyan |
 | 41 | **श्री षोडशायुधस्तोत्रम्** · śrī ṣōḍaśāyudhastōtram | [Malola Kannan](https://youtu.be/VFGj8Y-oTDU) | with the opening and closing taniyan |
+| 42 | **श्रीगरुडदण्डकः** · śrīgaruḍadaṇḍakaḥ | [YouTube](https://youtu.be/_x3C37kE9Ug) | with the opening and closing taniyan |
 | 43 | **श्रीदेशिकमङ्गळम्** · śrīdēśikamaṅgaḷam | [Malola Kannan & N S Ranganathan](https://youtu.be/0zhWV393WPY) | with its two opening and two closing taniyans, and the saptati ratna mālikā ślōkas |
 | 44 | **पुरुषसूक्तम्** · puruṣasūktam | [Malola Kannan](https://youtu.be/ga0cKR93P6w) | with the svara marks (॒ ॑ ᳚) |
 | 45 | **विष्णुसूक्तम्** · viṣṇusūktam | [Malola Kannan](https://youtu.be/RiPlUn47R7U) | with the svara marks |
@@ -58,8 +63,7 @@ In the Vēdam texts, the alternate readings prapatti.com prints in red are left 
 
 Every recording is Maalola Kannan's: Amutham Music's series (Desika Stotram, Nithyanusandhanam, Ramanusa
 Noottrandhadi, Panchasuktham) where there is one, otherwise his Achyuthapaaduka channel or GSPK. Still waiting for
-a recording: nīrāṭṭam (4), vāraṇamāyiram (11), aṅgaṇ ñālam (13), kāśaiyāḍai (14), vāṇilā muṟuval (15),
-and stōtras 26, 29, 30, 32 and 42.
+a recording: nīrāṭṭam (4), vāraṇamāyiram (11), aṅgaṇ ñālam (13), kāśaiyāḍai (14) and vāṇilā muṟuval (15).
 
 ## Features
 
@@ -146,6 +150,7 @@ The text generators in `tools/` apply these rules when they build each slokam's 
   settings in `%APPDATA%\Slokam Player\settings.json`. It serves `src/` from `127.0.0.1` because
   YouTube's embedded player won't run from a `file://` page.
 - `src/player.js` plays the recording and reports the exact playback position:
+  - **MP3 recordings** (prapatti.com's) play directly in the widget.
   - Most videos play in YouTube's **embedded player** inside the widget.
   - Some uploaders turn embedding off; the Dayāśatakam video is one of them. For those, the app opens the
     **normal YouTube page in a separate window**, kept hidden unless *Show video* is on, and controls it from
