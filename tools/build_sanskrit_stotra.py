@@ -23,8 +23,8 @@ ap.add_argument('--gadyam', action='store_true', help='prose work (Raghuvīra Ga
 ap.add_argument('--repeat-closing-phrases', type=int, default=0, metavar='N',
                 help='gadyam: the last N prose phrases are chanted twice together '
                      '(Raghuvīra Gadyam: 2, śrīrāmabhadra ! namastē punastē namaḥ !)')
-ap.add_argument('--one-line', action='store_true',
-                help='show each ślōka (not the taniyans) as a single line (Garuḍa Daṇḍakam)')
+ap.add_argument('--one-line', metavar='N,N',
+                help='show these ślōkas each as a single line (Garuḍa Daṇḍakam: 2,3,4,5, the daṇḍaka sections)')
 ap.add_argument('--repeat-last', type=int, default=1, metavar='N',
                 help='how many final ślōkas are chanted twice (Garuḍa Daṇḍakam: 2)')
 ap.add_argument('--revision', type=int, default=1,
@@ -155,9 +155,10 @@ def dev(t):
 
 out = [{'v': u['v'], 'text': (dev(u['text']) + (' ' + u['end'] if u['end'] else '')).strip()} for u in units]
 if ARGS.one_line:
+    one = {int(x) for x in ARGS.one_line.split(',')}
     merged = []
     for o in out:
-        if merged and o['v'] == merged[-1]['v'] and o['v'] not in (0, closing):
+        if merged and o['v'] == merged[-1]['v'] and o['v'] in one:
             prev = merged[-1]['text']
             # a word broken across lines ("…कण्टक-" + "व्रात…") joins without the hyphen or a space
             merged[-1]['text'] = prev[:-1] + o['text'] if prev.endswith('-') else prev + ' ' + o['text']
