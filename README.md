@@ -129,7 +129,7 @@ If everything is consistently a bit early or late, use **Timing offset** (±0.5 
 - **Andādis** (Irāmānuśa Nūṟṟandādi, Piḷḷai Andādi, Kaṇṇinuṇ Śiṟuttāmbu): after the last pāsuram, pāsuram 1 is
   chanted once more, and the lyrics jump back to it.
 - **Sanskrit Dēśika stōtras:** the first and last ślōkas are chanted twice. For Dayāśatakam that's ślōkas 1 and 108.
-  Garuḍa Daṇḍakam, Kāmāsikāṣṭakam and Gōpālaviṃśati repeat their first ślōka and their last two.
+  Garuḍa Daṇḍakam, Kāmāsikāṣṭakam, Gōpālaviṃśati and Ṣōḍaśāyudhastōtram repeat their first ślōka and their last two.
 - **Raghuvīra Gadyam:** the closing pair श्रीरामभद्र ! नमस्ते पुनस्ते नमः ! is chanted twice together, and both
   closing ślōkas twice.
 - **Tirupallāṇḍu:** the PDF's pāsurams 1 and 2 are shown as one pāsuram 1, so it has 11.
