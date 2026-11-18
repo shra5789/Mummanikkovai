@@ -17,7 +17,7 @@ window.SLOKAM_LIBRARY = [
       { n: 9, iast: 'kaṇṇinuṇ śiṟuttāmbu', native: 'கண்ணிநுண் சிறுத்தாம்பு', text: 'kanninun', youtube: 'ZidX8qMmfUs', duration: 225 },
       { n: 10, iast: 'irāmānuśa nūṟṟandādi', native: 'இராமாநுச நூற்றந்தாதி', text: 'ramanujanutrandadi', youtube: '-PkD67xhHf0' },
       { n: 11, iast: 'vāraṇamāyiram', native: 'வாரணமாயிரம்' },
-      { n: 12, iast: 'tiruvezukūṟṟirukkai', native: 'திருவெழுகூற்றிருக்கை' },
+      { n: 12, iast: 'tiruvezukūṟṟirukkai', native: 'திருவெழுகூற்றிருக்கை', text: 'tiruvezukurrirukkai', youtube: '5MPUwn8JafE' },
       { n: 13, iast: 'aṅgaṇ ñālam', native: 'அங்கண் ஞாலம்' },
       { n: 14, iast: 'kāśaiyāḍai', native: 'காசையாடை' },
       { n: 15, iast: 'vāṇilā muṟuval', native: 'வாணிலா முறுவல்' },
@@ -26,14 +26,14 @@ window.SLOKAM_LIBRARY = [
   {
     id: 'desika-prabandham', iast: 'dēśika prabandaṅgaḷ', native: 'தேசிக ப்ரபந்தங்கள்', lang: 'ta',
     items: [
-      { n: 16, iast: 'aḍaikkalappattu', native: 'அடைக்கலப்பத்து' },
+      { n: 16, iast: 'aḍaikkalappattu', native: 'அடைக்கலப்பத்து', text: 'adaikkalappattu', youtube: '0v2QxDExoAU' },
       {
         n: 17, iast: 'mummaṇikkōvai', native: 'மும்மணிக்கோவை',
         text: 'mummanikkovai', youtube: '_S8ixInldNY', duration: 416,
       },
-      { n: 18, iast: 'navamaṇimālai', native: 'நவமணிமாலை' },
-      { n: 19, iast: 'adikārasaṅgraham', native: 'அதிகாரஸங்க்ரஹம்', text: 'adhikarasangraham', youtube: 'aS4UwpNdbHo' },
-      { n: 20, iast: 'śrī vaiṇavadinaśari', native: 'ஸ்ரீ வைணவ தினசரி' },
+      { n: 18, iast: 'navamaṇimālai', native: 'நவமணிமாலை', text: 'navamanimalai', youtube: 'tNa-YkfeeGA' },
+      { n: 19, iast: 'adikārasaṅgraham', native: 'அதிகாரஸங்க்ரஹம்', text: 'adhikarasangraham', youtube: 'HArjuc4zkPs' },
+      { n: 20, iast: 'śrī vaiṇavadinaśari', native: 'ஸ்ரீ வைணவ தினசரி', text: 'vaishnavadinasari', youtube: 'wW08-hGrcXg' },
       { n: 21, iast: 'prabandasāram', native: 'ப்ரபந்தஸாரம்', text: 'prabandhasaram', youtube: 'e_RE0UgoD98' },
       { n: 22, iast: 'piḷḷaiyandādi', native: 'பிள்ளையந்தாதி', text: 'pillaiyandadi', youtube: 'M-wqP9qrWUk' },
       { n: 23, iast: 'meyviradamānmiyam', native: 'மெய்விரதமான்மியம்', text: 'meyviradamanmiyam', youtube: 'fv3cNTJAc_Q' },

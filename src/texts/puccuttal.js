@@ -3,8 +3,9 @@
 // pāsurams marked ‡ in the PDF are said twice.
 window.SLOKAM_TEXTS = window.SLOKAM_TEXTS || {};
 window.SLOKAM_TEXTS["puccuttal"] = {
+  revision: 2,
   verseWord: "பாசுரம்", verseCount: 10, labels: {},
-  order: [1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10],
+  order: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10],
   lines: [
     {"v": 1, "text": "ஆனிரை மேய்க்க நீ போதி"},
     {"v": 1, "text": "அரு மருந்தாவதறியாய்"},

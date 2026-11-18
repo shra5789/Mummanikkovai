@@ -26,7 +26,9 @@ ap.add_argument('--extra-taniyans', metavar='TEXT:FIRST-LAST',
 ap.add_argument('--desika', action='store_true',
                 help='a Dēśika prabandham PDF: no "தனியன்கள்" heading; everything before pāsuram 1 is taniyans')
 ap.add_argument('--drop-taniyans', metavar='N,N',
-                help='leave out these taniyans (1 = the first one printed), when the recording skips them')
+                help='leave out these taniyans (1 = the first one printed, or "all"), when the recording skips them')
+ap.add_argument('--no-repeat', metavar='N,N',
+                help='pāsurams marked ‡ that the recording nevertheless chants only once')
 ap.add_argument('--andadi', action='store_true',
                 help='an andādi: pāsuram 1 is chanted once more after the last pāsuram')
 ap.add_argument('--revision', type=int, default=1,
@@ -36,7 +38,7 @@ args = ap.parse_args()
 raw = [l.strip() for l in open(args.text, encoding='utf-8').read().splitlines()]
 
 JUNK = re.compile(r'^(ஶ்ரீ:|ஶ்ரீமதே .*நம:|www\.prapatti\.com|\d+|Sunder Kidāmbi|This document has been prepared by|'
-                  r'with the blessings of|His Holiness .*|ஶ்ரீ ரங்க₃ராமாநுஜ மஹாதே₃ஶிகன்|தனியன்கள்|.* அருளிச்செய்த.*|'
+                  r'with the blessings of|His Holiness .*|ஶ்ரீ ரங்க₃ராமாநுஜ மஹாதே₃ஶிகன்|தனியன்(கள்)?|.* அருளிச்செய்த.*|'
                   r'.*திருவடிகளே சரணம்.*|\d+(\.\d+)* – .*|.*\. \. \. .*)$')
 SANSKRIT = re.compile(r'[₁₂₃₄ஶஸஷஜஹ]')
 VERSE_END = re.compile(r'॥\s*॥\s*([\d.]+)\s*॥\s*॥\s*$')
@@ -89,25 +91,46 @@ elif args.desika:
     end = next((k for k, l in enumerate(rest) if l.endswith('முற்றிற்று') or l.startswith('அடிவரவு')), len(rest))
     body = verse1 + rest[:end]
 else:
-    t = next(k for k, l in enumerate(raw) if l == 'தனியன்கள்')
+    t = next(k for k, l in enumerate(raw) if l in ('தனியன்கள்', 'தனியன்'))
     taniyan_blocks = taniyans_after(t)
     first = next(k for k in range(t, len(raw)) if raw[k].startswith('‡'))
     end = next(k for k in range(first, len(raw)) if raw[k].endswith('முற்றிற்று') or raw[k].startswith('அடிவரவு'))
     body = raw[first:end]
 
 out, repeated, verse, buf = [], set(), 1, []
+reading = []          # verse ids in the order they're printed (and chanted)
+extras = []           # verses the PDF doesn't number: chanted once, labelled without a number
+
+def emit(lines_, v):
+    for k, b in enumerate(lines_):
+        text = re.sub(r'॥.*$', '', b)
+        text = re.sub(r'[⋆‡]', '', text)
+        o = {'v': v, 'text': re.sub(r'\s+', ' ', text).strip()}
+        # ‡ partway through a pāsuram marks a single line that is chanted twice
+        # (Tiruvezukūṟṟirukkai's செல்வம் மல்கு தென் திருக்குடந்தை)
+        if k > 0 and b.startswith('‡'):
+            o['rep'] = 1
+        out.append(o)
+    reading.append(v)
+
 for l in body:
     if not l or JUNK.match(l) or l in titles or l.startswith('அடிவரவு') or l.endswith('முற்றிற்று'):
         continue
     if not buf and l.startswith('‡'):
         repeated.add(verse)
     buf.append(l)
-    if VERSE_END.search(l):
-        for b in buf:
-            text = re.sub(r'॥.*$', '', b)
-            text = re.sub(r'[⋆‡]', '', text)
-            out.append({'v': verse, 'text': re.sub(r'\s+', ' ', text).strip()})
+    if buf[0].startswith('(') and l.endswith(')'):
+        # a bracketed, unnumbered verse between two pāsurams (Adhikāra Saṅgraham)
+        ex = 1000 + len(extras) + 1; extras.append(ex)
+        repeated.discard(verse)
+        emit(buf, ex); buf = []
+    elif VERSE_END.search(l):
+        emit(buf, verse)
         verse += 1; buf = []
+# a closing verse the PDF leaves unnumbered (Tiruvezukūṟṟirukkai's இடங்கொண்ட நெஞ்சத்து …): chanted once
+if buf and any(b.endswith('⋆') for b in buf):   # verse lines carry ⋆; leftover index lines don't
+    ex = 1000 + len(extras) + 1; extras.append(ex)
+    emit(buf, ex)
 
 if args.extra_taniyans:
     path, rng = args.extra_taniyans.rsplit(':', 1)
@@ -123,7 +146,7 @@ if args.extra_taniyans:
     taniyan_blocks = [extra[k] for k in range(first_n, last_n + 1)] + taniyan_blocks
 
 if args.drop_taniyans:
-    drop = {int(x) for x in args.drop_taniyans.split(',')}
+    drop = set(range(1, len(taniyan_blocks) + 1)) if args.drop_taniyans == 'all' else {int(x) for x in args.drop_taniyans.split(',')}
     taniyan_blocks = [b for k, b in enumerate(taniyan_blocks, 1) if k not in drop]
 
 lines = []
@@ -136,21 +159,25 @@ for n, block in enumerate(taniyan_blocks, 1):
         lines.append({'v': -n, 'text': text})
 lines += out
 
-verses = sorted({o['v'] for o in out})
-order = [-n for n in range(1, len(taniyan_blocks) + 1)] + [v for v in verses for _ in range(2 if v in repeated else 1)]
+if args.no_repeat:
+    repeated -= {int(x) for x in args.no_repeat.split(',')}
+order = [-n for n in range(1, len(taniyan_blocks) + 1)] + [v for v in reading for _ in range(2 if v in repeated else 1)]
 if args.andadi:
-    order.append(verses[0])   # an andādi closes the circle: pāsuram 1 once more at the end
+    order.append(reading[0])   # an andādi closes the circle: pāsuram 1 once more at the end
 labels = {str(-n): 'தனியன்' for n in range(1, len(taniyan_blocks) + 1)}
+for ex in extras:
+    labels[str(ex)] = 'பாசுரம்'
+numbered_count = len([v for v in reading if v not in extras])
 
 src = args.text.rsplit('/', 1)[-1]
 print(f'// Generated by tools/build_tamil_prabandham.py from prapatti.com\'s {src.replace(".txt", ".pdf")}'
       + (f' (decade {args.section})' if args.section else '') + '.')
 print('// v = pāsuram number (negative = taniyan). order: verses in the order they are chanted;')
-print('// pāsurams marked ‡ in the PDF are said twice.')
+print('// pāsurams marked ‡ in the PDF are said twice; a line with rep: 1 is said twice in a row.')
 print('window.SLOKAM_TEXTS = window.SLOKAM_TEXTS || {};')
 print(f'window.SLOKAM_TEXTS[{json.dumps(args.id)}] = {{')
 print(f'  revision: {args.revision},')
-print(f'  verseWord: "பாசுரம்", verseCount: {len(verses)}, labels: {json.dumps(labels, ensure_ascii=False)},')
+print(f'  verseWord: "பாசுரம்", verseCount: {numbered_count}, labels: {json.dumps(labels, ensure_ascii=False)},')
 print(f'  order: {json.dumps(order)},')
 print('  lines: [')
 for o in lines:

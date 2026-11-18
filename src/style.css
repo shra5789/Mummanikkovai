@@ -121,7 +121,18 @@ kbd { font: inherit; font-size: 10px; padding: 0 4px; border-radius: 4px; backgr
 .progress { flex: 1; height: 14px; display: flex; align-items: center; cursor: pointer; position: relative; }
 .progress::before { content: ""; position: absolute; left: 0; right: 0; height: 3px; border-radius: 3px; background: rgba(var(--fg), .2); }
 .progress .fill { position: relative; height: 3px; border-radius: 3px; background: rgba(var(--fg), .85); width: 0; }
-.progress:hover .fill { background: var(--accent); }
+.progress:hover .fill, .progress.dragging .fill { background: var(--accent); }
+/* the seek dot at the playback position */
+.progress .knob {
+  position: absolute; top: 50%; left: 0; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px;
+  border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.5);
+  transition: transform .15s; touch-action: none;
+}
+.progress:hover .knob, .progress.dragging .knob { transform: scale(1.25); background: var(--accent); }
+.progress { touch-action: none; }
+body.fullscreen .progress .knob { width: 14px; height: 14px; margin: -7px 0 0 -7px; }
+/* a single line chanted twice (Tiruvezukūṟṟirukkai's செல்வம் மல்கு …) */
+.line.line-repeat .txt::before { content: "↻ "; color: var(--accent); -webkit-text-fill-color: var(--accent); }
 
 /* ---------- minimized pill ---------- */
 .pill { display: none; align-items: center; gap: 4px; height: 100%; padding: 0 6px; }

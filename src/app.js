@@ -50,10 +50,19 @@
     return ans;
   }
   const isRepeat = (e) => seq.slice(0, e).includes(seq[e]); // a line already recited earlier
+  // Tamil works mark a verse that is chanted more than once with ↻ beside its number
+  // (Sanskrit works don't get the mark)
+  const REPEAT_MARK = '↻';
+  function chantedAgain(v) {
+    if (item.lang !== 'ta' || !(v > 0)) return false;
+    const firstLine = T.lines.findIndex((l) => l.v === v);
+    return seq.filter((i) => i === firstLine).length > 1;
+  }
   function label(e) {
     if (e < 0 || e >= seq.length) return '';
     const v = T.lines[seq[e]].v;
-    const name = (T.labels && T.labels[v]) || `${T.verseWord} ${v} / ${T.verseCount}`.trim();
+    const num = chantedAgain(v) ? `${v} ${REPEAT_MARK}` : v;
+    const name = (T.labels && T.labels[v]) || `${T.verseWord} ${num} / ${T.verseCount}`.trim();
     return name + (isRepeat(e) ? ' · ' + REPEAT_WORD[item.lang] : '');
   }
   let toastTimer;
@@ -65,13 +74,14 @@
   const saveMine = (patch) => { Object.assign(mine(), patch); save({ slokams: S.slokams }); };
 
   // default playback order: each verse in `order`, all of its lines
-  const defaultSeq = () => T.order.flatMap((v) => T.lines.map((l, i) => (l.v === v ? i : -1)).filter((i) => i >= 0));
+  // (a line marked rep — Tiruvezukūṟṟirukkai's செல்வம் மல்கு — is chanted twice in a row)
+  const defaultSeq = () => T.order.flatMap((v) => T.lines.flatMap((l, i) => (l.v === v ? (l.rep ? [i, i] : [i]) : [])));
 
   // Estimated start times, spread over the recording by how many letters each line has,
   // with a short pause between verses. Sync mode replaces these with exact ones.
   function estimate(s, dur) {
     const letters = (txt) => (txt.match(/\p{L}/gu) || []).length;
-    const gap = (k) => (k > 0 && s[k] !== s[k - 1] + 1 ? 8 : 0);
+    const gap = (k) => (k > 0 && s[k] !== s[k - 1] + 1 && s[k] !== s[k - 1] ? 8 : 0);
     const w = s.map((i, k) => letters(T.lines[i].text) + 3 + gap(k));
     const start = Math.min(3, dur * 0.01), end = dur - Math.min(6, dur * 0.015);
     const scale = (end - start) / w.reduce((a, b) => a + b, 0);
@@ -107,10 +117,11 @@
       li.className = 'line';
       if (i === 0 || T.lines[i - 1].v !== ln.v) {
         li.classList.add('verse-start');
-        li.dataset.verse = (T.labels && T.labels[ln.v]) || ln.v;
+        li.dataset.v = ln.v;
       }
       // inline span: when a line wraps, its background is laid out as one continuous strip,
       // so the highlight sweeps the first row and then the second instead of both at once
+      if (ln.rep) li.classList.add('line-repeat'); // shown with ↻ in front
       const txt = document.createElement('span'); txt.className = 'txt'; txt.textContent = ln.text;
       li.appendChild(txt);
       li.addEventListener('click', () => {
@@ -122,6 +133,16 @@
         if (best >= 0) { player.seek(t0(best) + 0.01); player.play(); userScrollUntil = 0; }
       });
       ol.appendChild(li); lis.push(li);
+    });
+    markVerses();
+  }
+  // the small verse number shown above each verse, with ↻ when it's chanted again
+  function markVerses() {
+    lis.forEach((li) => {
+      if (li.dataset.v === undefined) return;
+      const v = +li.dataset.v;
+      const base = (T.labels && T.labels[v]) || v;
+      li.dataset.verse = chantedAgain(v) ? `${base} ${REPEAT_MARK}` : base;
     });
   }
 
@@ -157,6 +178,7 @@
   // ---------- main loop ----------
   let adShown = false;
   let wasPlaying = false;
+  let dragFrac = null;   // 0–1 while the seek dot is being dragged
   function tick() {
     if (player && item) {
       const t = player.time();
@@ -198,7 +220,11 @@
       if (player.playing() !== document.body.classList.contains('playing')) updatePlayButtons();
       $('time').textContent = fmt(t);
       $('duration').textContent = fmt(dur);
-      $('progressFill').style.width = (dur > 0 ? (100 * t / dur) : 0).toFixed(2) + '%';
+      // while the dot is being dragged, show where it is rather than where playback is
+      const frac = dragFrac != null ? dragFrac : (dur > 0 ? t / dur : 0);
+      $('progressFill').style.width = (100 * frac).toFixed(2) + '%';
+      $('progressKnob').style.left = (100 * frac).toFixed(2) + '%';
+      if (dragFrac != null) $('time').textContent = fmt(dragFrac * dur);
     }
     requestAnimationFrame(tick);
   }
@@ -276,6 +302,7 @@
       times = newTimes.map((t) => Math.round(t * 100) / 100);
       estimatedFor = null;
       saveMine({ timings: times, seq, offset: 0, rev: revision() });
+      markVerses();
       $('offVal').textContent = '0.0s';
       toast((n === total ? 'Timings saved for every line ✓' : `Saved ${n} of ${total} lines — run Sync again later to finish.`)
         + (skipped ? ` Skipped ${skipped} line${skipped > 1 ? 's' : ''} not in the recording.` : ''));
@@ -392,16 +419,29 @@
     $('btnMark').onclick = mark;
     $('btnSkip').onclick = skip;
     $('btnReset').onclick = () => {
-      saveMine({ timings: null, seq: null, offset: 0 }); loadTimings(); applyLook(); updateTimingNote();
+      saveMine({ timings: null, seq: null, offset: 0 }); loadTimings(); markVerses(); applyLook(); updateTimingNote();
       toast('Timings reset to the built-in estimates.');
     };
     $('btnQuit').onclick = () => store.quit();
 
-    $('progress').addEventListener('click', (e) => {
-      const r = e.currentTarget.getBoundingClientRect();
-      player && player.seek(((e.clientX - r.left) / r.width) * player.duration());
-      userScrollUntil = 0;
+    // seek: click anywhere on the line, or drag the dot
+    const bar = $('progress');
+    const fracAt = (e) => { const r = bar.getBoundingClientRect(); return Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); };
+    bar.addEventListener('pointerdown', (e) => {
+      if (!player) return;
+      bar.setPointerCapture(e.pointerId);
+      dragFrac = fracAt(e); bar.classList.add('dragging');
     });
+    bar.addEventListener('pointermove', (e) => { if (dragFrac != null) dragFrac = fracAt(e); });
+    const endDrag = (e) => {
+      if (dragFrac == null) return;
+      const f = e.type === 'pointerup' ? fracAt(e) : dragFrac;
+      dragFrac = null; bar.classList.remove('dragging');
+      if (player) player.seek(f * player.duration());
+      userScrollUntil = 0;
+    };
+    bar.addEventListener('pointerup', endDrag);
+    bar.addEventListener('pointercancel', endDrag);
     $('viewport').addEventListener('wheel', () => { userScrollUntil = performance.now() + 4000; }, { passive: true });
 
     window.addEventListener('keydown', (e) => {

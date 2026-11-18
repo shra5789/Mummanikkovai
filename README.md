@@ -22,8 +22,12 @@ Available now:
 | 8 | **அமலனாதிபிரான்** · amalanādipirān | 〃 | with taniyans |
 | 9 | **கண்ணிநுண் சிறுத்தாம்பு** · kaṇṇinuṇ śiṟuttāmbu | 〃 | with taniyans |
 | 10 | **இராமாநுச நூற்றந்தாதி** · irāmānuśa nūṟṟandādi | [Maalola Kannan & N S Ranganathan](https://youtu.be/-PkD67xhHf0) | with taniyans |
+| 12 | **திருவெழுகூற்றிருக்கை** · tiruvezukūṟṟirukkai | [YouTube](https://youtu.be/5MPUwn8JafE) | one long pāsuram chanted twice, then the unnumbered closing verse |
+| 16 | **அடைக்கலப்பத்து** · aḍaikkalappattu | [YouTube](https://youtu.be/0v2QxDExoAU) | with Swami Dēśikan's taniyan |
 | 17 | **மும்மணிக்கோவை** · mummaṇikkōvai | [Thiruvayindhai K. Malolakannan & N. S. Ranganathan](https://youtu.be/_S8ixInldNY) | the ten pāsurams |
-| 19 | **அதிகாரஸங்க்ரஹம்** · adikārasaṅgraham | [Malola Kannan](https://youtu.be/aS4UwpNdbHo) | with Swami Dēśikan's taniyan |
+| 18 | **நவமணிமாலை** · navamaṇimālai | [YouTube](https://youtu.be/tNa-YkfeeGA) | the pāsurams (the recording skips the taniyans) |
+| 19 | **அதிகாரஸங்க்ரஹம்** · adikārasaṅgraham | [YouTube](https://youtu.be/HArjuc4zkPs) | the pāsurams (the recording skips the taniyan) |
+| 20 | **ஸ்ரீ வைணவ தினசரி** · śrī vaiṇavadinaśari | [YouTube](https://youtu.be/wW08-hGrcXg) | the pāsurams (the recording skips the taniyans) |
 | 21 | **ப்ரபந்தஸாரம்** · prabandasāram | [Maalola Kannan & N S Ranganathan](https://youtu.be/e_RE0UgoD98) | with taniyans |
 | 22 | **பிள்ளையந்தாதி** · piḷḷaiyandādi | [Maalola Kannan & N S Ranganathan](https://youtu.be/M-wqP9qrWUk) | with its own taniyan (the recording skips சீரொன்று தூப்புல்) |
 | 23 | **மெய்விரதமான்மியம்** · meyviradamānmiyam | [YouTube](https://www.youtube.com/watch?v=fv3cNTJAc_Q) | with its own taniyan (the recording skips சீரொன்று தூப்புல்) |
@@ -54,14 +58,14 @@ In the Vēdam texts, the alternate readings prapatti.com prints in red are left 
 
 Every recording is Maalola Kannan's: Amutham Music's series (Desika Stotram, Nithyanusandhanam, Ramanusa
 Noottrandhadi, Panchasuktham) where there is one, otherwise his Achyuthapaaduka channel or GSPK. Still waiting for
-a recording: nīrāṭṭam (4), vāraṇamāyiram (11), tiruvezukūṟṟirukkai (12), aṅgaṇ ñālam (13), kāśaiyāḍai (14),
-vāṇilā muṟuval (15), aḍaikkalappattu (16), navamaṇimālai (18), vaiṇava dinaśari (20), and stōtras 26, 29, 30, 32
-and 42. Some of these exist only inside long combined recordings (Kovil Thiruvaimozhi, Desika Prabandham Vol 1–3).
+a recording: nīrāṭṭam (4), vāraṇamāyiram (11), aṅgaṇ ñālam (13), kāśaiyāḍai (14), vāṇilā muṟuval (15),
+and stōtras 26, 29, 30, 32 and 42.
 
 ## Features
 
 - **Floats above other windows** and stays put. It's frameless and see-through, and you can drag it anywhere by its title bar.
 - **Spotify-style lyrics:** the current line fills in with a white sweep (row by row when it wraps), past lines dim, and clicking any line jumps the recitation there.
+- **Seek** by dragging the dot on the progress line, or clicking anywhere on it.
 - **Follows the repeats.** When a verse is chanted a second time, the highlight jumps back to it and the header
   shows *மீண்டும்* (Tamil) or *पुनः* (Sanskrit). See [Repeats](#repeats).
 - **Full screen** (`⛶` or `F`) fills the screen with large, centred lyrics on a dark backdrop.
@@ -109,7 +113,12 @@ If everything is consistently a bit early or late, use **Timing offset** (±0.5 
 ## Repeats
 
 - **Tamil prabandhams:** a verse whose first line starts with **‡** in the prapatti.com text is chanted twice.
-  For Mummanikkovai that's pāsurams 1, 9 and 10; for Tirupallāṇḍu 1, 2, 11 and 12.
+  For Mummanikkovai that's pāsurams 1, 9 and 10; for Tirupallāṇḍu 1, 2, 11 and 12. Where a recording differs, the
+  exception is set by hand: Pūccūṭṭal's recording chants pāsuram 1 only once.
+  A **‡** partway through a pāsuram marks a single line chanted twice in a row: Tiruvezukūṟṟirukkai's
+  செல்வம் மல்கு தென் திருக்குடந்தை, shown with ↻ in front of it.
+  In Tamil works, every verse that is chanted more than once has **↻** next to its number (Sanskrit works don't).
+  Unnumbered verses (Tiruvezukūṟṟirukkai's closing verse, the bracketed verse in Adhikāra Saṅgraham) are chanted once.
 - **Andādis** (Irāmānuśa Nūṟṟandādi, Piḷḷai Andādi, Kaṇṇinuṇ Śiṟuttāmbu): after the last pāsuram, pāsuram 1 is
   chanted once more, and the lyrics jump back to it.
 - **Sanskrit Dēśika stōtras:** the first and last ślōkas are chanted twice. For Dayāśatakam that's ślōkas 1 and 108.
