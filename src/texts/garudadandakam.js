@@ -3,8 +3,9 @@
 // order: in the order they are chanted (the first and last ślōkas are said twice).
 window.SLOKAM_TEXTS = window.SLOKAM_TEXTS || {};
 window.SLOKAM_TEXTS["garudadandakam"] = {
+  revision: 2,
   verseWord: "श्लोकः", verseCount: 7, labels: {"0": "तनियन्", "8": "तनियन्"},
-  order: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7, 8],
+  order: [0, 1, 1, 2, 3, 4, 5, 6, 6, 7, 7, 8],
   lines: [
     {"v": 0, "text": "श्रीमान् वेङ्कटनाथार्यः कवितार्किककेसरी ।"},
     {"v": 0, "text": "वेदान्ताचार्यवर्यो मे सन्निधत्तां सदा हृदि ॥"},

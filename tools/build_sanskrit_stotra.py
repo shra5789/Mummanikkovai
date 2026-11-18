@@ -20,6 +20,8 @@ ap = argparse.ArgumentParser()
 ap.add_argument('pdf'); ap.add_argument('id')
 ap.add_argument('--prakrit', action='store_true', help='Prakrit work: keep the Prakrit, drop each Sanskrit chāyā')
 ap.add_argument('--gadyam', action='store_true', help='prose work (Raghuvīra Gadyam): "!"-phrases grouped by kāṇḍa')
+ap.add_argument('--repeat-last', type=int, default=1, metavar='N',
+                help='how many final ślōkas are chanted twice (Garuḍa Daṇḍakam: 2)')
 ap.add_argument('--revision', type=int, default=1,
                 help='bump when the lines or order change, so the app drops timings synced to the old ones')
 ARGS = ap.parse_args()
@@ -153,7 +155,7 @@ labels = {k: (dev(v[6:]) if v.startswith('KANDA:') else v) for k, v in labels.it
 verses = sorted({o['v'] for o in out if o['v'] not in (0, closing)})
 numbered = [v for v in verses if v not in appendix]
 first, last = numbered[0], numbered[-1]
-twice = {first, last}
+twice = {first} | set(numbered[-ARGS.repeat_last:])
 if ARGS.gadyam:
     # Raghuvīra Gadyam: both closing ślōkas after the last kāṇḍa (caturmukhēśvara … and
     # kavikathakasiṃha …) are chanted twice

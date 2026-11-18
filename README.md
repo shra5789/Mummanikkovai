@@ -126,6 +126,7 @@ If everything is consistently a bit early or late, use **Timing offset** (±0.5 
 - **Andādis** (Irāmānuśa Nūṟṟandādi, Piḷḷai Andādi, Kaṇṇinuṇ Śiṟuttāmbu): after the last pāsuram, pāsuram 1 is
   chanted once more, and the lyrics jump back to it.
 - **Sanskrit Dēśika stōtras:** the first and last ślōkas are chanted twice. For Dayāśatakam that's ślōkas 1 and 108.
+  Garuḍa Daṇḍakam repeats its first ślōka and its last two.
 - **Vēdam:** nothing is repeated.
 
 The text generators in `tools/` apply these rules when they build each slokam's playback order.
