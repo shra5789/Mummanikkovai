@@ -77,7 +77,21 @@
 
   // default playback order: each verse in `order`, all of its lines
   // (a line marked rep — Tiruvezukūṟṟirukkai's செல்வம் மல்கு — is chanted twice in a row)
-  const defaultSeq = () => T.order.flatMap((v) => T.lines.flatMap((l, i) => (l.v === v ? (l.rep ? [i, i] : [i]) : [])));
+  // (a line marked group: n starts n lines chanted twice together — Raghuvīra Gadyam's
+  //  श्रीरामभद्र ! नमस्ते पुनस्ते नमः !)
+  function defaultSeq() {
+    return T.order.flatMap((v) => {
+      const idx = T.lines.map((l, i) => (l.v === v ? i : -1)).filter((i) => i >= 0);
+      const out = [];
+      for (let k = 0; k < idx.length; k++) {
+        const l = T.lines[idx[k]];
+        if (l.group) { const g = idx.slice(k, k + l.group); out.push(...g, ...g); k += l.group - 1; }
+        else if (l.rep) out.push(idx[k], idx[k]);
+        else out.push(idx[k]);
+      }
+      return out;
+    });
+  }
 
   // Estimated start times, spread over the recording by how many letters each line has,
   // with a short pause between verses. Sync mode replaces these with exact ones.

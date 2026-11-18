@@ -20,6 +20,9 @@ ap = argparse.ArgumentParser()
 ap.add_argument('pdf'); ap.add_argument('id')
 ap.add_argument('--prakrit', action='store_true', help='Prakrit work: keep the Prakrit, drop each Sanskrit chāyā')
 ap.add_argument('--gadyam', action='store_true', help='prose work (Raghuvīra Gadyam): "!"-phrases grouped by kāṇḍa')
+ap.add_argument('--repeat-closing-phrases', type=int, default=0, metavar='N',
+                help='gadyam: the last N prose phrases are chanted twice together '
+                     '(Raghuvīra Gadyam: 2, śrīrāmabhadra ! namastē punastē namaḥ !)')
 ap.add_argument('--repeat-last', type=int, default=1, metavar='N',
                 help='how many final ślōkas are chanted twice (Garuḍa Daṇḍakam: 2)')
 ap.add_argument('--revision', type=int, default=1,
@@ -149,6 +152,11 @@ def dev(t):
     return sanscript.transliterate(t, sanscript.ISO, sanscript.DEVANAGARI)
 
 out = [{'v': u['v'], 'text': (dev(u['text']) + (' ' + u['end'] if u['end'] else '')).strip()} for u in units]
+if ARGS.repeat_closing_phrases:
+    # the last prose phrases (lines without a daṇḍa) before the closing ślōkas, chanted twice as a group
+    phrase_idx = [k for k, u in enumerate(units) if ARGS.gadyam and u['end'] == '' and labels.get(u['v'], '').startswith('KANDA:')]
+    first_of_group = phrase_idx[-ARGS.repeat_closing_phrases]
+    out[first_of_group]['group'] = ARGS.repeat_closing_phrases
 labels = {k: (dev(v[6:]) if v.startswith('KANDA:') else v) for k, v in labels.items()}
 
 # Sanskrit Dēśika stōtras: the first and last ślōkas are chanted twice.
