@@ -50,7 +50,7 @@ Available now:
 | 40 | **श्रीसुदर्शनाष्टकम्** · śrīsudarśanāṣṭakam | [Malola Kannan](https://youtu.be/rpd2QJeV54Y) | with the opening and closing taniyan |
 | 41 | **श्री षोडशायुधस्तोत्रम्** · śrī ṣōḍaśāyudhastōtram | [Malola Kannan](https://youtu.be/VFGj8Y-oTDU) | with the opening and closing taniyan |
 | 42 | **श्रीगरुडदण्डकः** · śrīgaruḍadaṇḍakaḥ | [YouTube](https://youtu.be/_x3C37kE9Ug) | with the opening and closing taniyan |
-| 43 | **श्रीदेशिकमङ्गळम्** · śrīdēśikamaṅgaḷam | [Malola Kannan & N S Ranganathan](https://youtu.be/0zhWV393WPY) | with its two opening and two closing taniyans, and the saptati ratna mālikā ślōkas |
+| 43 | **श्रीदेशिकमङ्गळम्** · śrīdēśikamaṅgaḷam | [Malola Kannan & N S Ranganathan](https://youtu.be/0zhWV393WPY) | with its two opening taniyans and the kavitārkikasiṃhāya closing taniyan |
 | 44 | **पुरुषसूक्तम्** · puruṣasūktam | [Malola Kannan](https://youtu.be/ga0cKR93P6w) | with the svara marks (॒ ॑ ᳚) |
 | 45 | **विष्णुसूक्तम्** · viṣṇusūktam | [Malola Kannan](https://youtu.be/RiPlUn47R7U) | with the svara marks |
 | 46 | **नारायणसूक्तम्** · nārāyaṇasūktam | [Malola Kannan](https://youtu.be/8OJWvbkjedQ) | with the svara marks |
@@ -114,6 +114,9 @@ Sync a slokam once and its timings are exact from then on:
    If a highlighted line isn't said at that point, press **S** (or *Skip*) and it's left out of the timeline.
    Press **Backspace** to undo a mark or skip, and **Esc** to stop early. Your marks are kept and the remaining lines shift to match.
 3. Your timings are saved on your PC, separately for each slokam. *Reset timings* goes back to the estimates.
+4. Stopped partway? The Library marks the slokam with a **blue ✓** (a fully synced one gets a **green ✓**).
+   Open it and press **R**, or ⚙ → **Resume sync**: it replays from the last line you marked and carries on,
+   keeping the marks you've already made.
 
 If everything is consistently a bit early or late, use **Timing offset** (±0.5 s steps) in ⚙ instead.
 
@@ -129,10 +132,13 @@ If everything is consistently a bit early or late, use **Timing offset** (±0.5 
 - **Andādis** (Irāmānuśa Nūṟṟandādi, Piḷḷai Andādi, Kaṇṇinuṇ Śiṟuttāmbu): after the last pāsuram, pāsuram 1 is
   chanted once more, and the lyrics jump back to it.
 - **Sanskrit Dēśika stōtras:** the first and last ślōkas are chanted twice. For Dayāśatakam that's ślōkas 1 and 108.
-  Garuḍa Daṇḍakam, Kāmāsikāṣṭakam, Gōpālaviṃśati, Ṣōḍaśāyudhastōtram and Gōdāstuti repeat their first ślōka and their last two.
+  These repeat their first ślōka and their last two: Hayagrīvastōtram, Daśāvatārastōtram, Kāmāsikāṣṭakam,
+  Gōpālaviṃśati, Śrīstuti, Gōdāstuti, Sudarśanāṣṭakam, Garuḍa Daṇḍakam and Dēśikamaṅgaḷam. Ṣōḍaśāyudhastōtram
+  repeats only its last two.
 - **Raghuvīra Gadyam:** the closing pair श्रीरामभद्र ! नमस्ते पुनस्ते नमः ! is chanted twice together, and both
   closing ślōkas twice.
-- **Tirupallāṇḍu:** the PDF's pāsurams 1 and 2 are shown as one pāsuram 1, so it has 11.
+- **Tirupallāṇḍu:** the PDF's pāsurams 1 and 2 are shown as one pāsuram 1, so it has 11. They're chanted
+  together twice: 1, 2, 1, 2.
 - **Vēdam:** nothing is repeated.
 
 The text generators in `tools/` apply these rules when they build each slokam's playback order.
@@ -148,6 +154,7 @@ The text generators in `tools/` apply these rules when they build each slokam's 
 | → / ⏭ | Next slokam (hover over ⏭ to see which one is up next) |
 | L | Open the Library |
 | N | Open settings |
+| R | Resume syncing a partly synced slokam |
 | Q | Quit |
 | F | Full screen on / off (Esc also leaves full screen) |
 | M | Minimize / expand |

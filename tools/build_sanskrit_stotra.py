@@ -23,6 +23,12 @@ ap.add_argument('--gadyam', action='store_true', help='prose work (Raghuvīra Ga
 ap.add_argument('--repeat-closing-phrases', type=int, default=0, metavar='N',
                 help='gadyam: the last N prose phrases are chanted twice together '
                      '(Raghuvīra Gadyam: 2, śrīrāmabhadra ! namastē punastē namaḥ !)')
+ap.add_argument('--no-first-repeat', action='store_true',
+                help='the first ślōka is chanted only once (Ṣōḍaśāyudhastōtram)')
+ap.add_argument('--drop-appendix', action='store_true',
+                help='leave out unnumbered ślōkas printed after the numbered ones (Dēśikamaṅgaḷam\'s saptati ratna mālikā)')
+ap.add_argument('--closing-taniyans', type=int, metavar='N',
+                help='keep only the first N closing taniyans (Dēśikamaṅgaḷam: 1)')
 ap.add_argument('--no-opening-taniyan', action='store_true',
                 help='leave out the opening taniyan (śrīmān vēṅkaṭanāthāryaḥ …) when the recording skips it')
 ap.add_argument('--one-line', metavar='N,N',
@@ -72,6 +78,14 @@ if cut is not None:
     k = next((j for j, l in enumerate(tail) if l.startswith('kavitārkikasiṃhāya')), None)
     if k is not None:
         closing_lines = tail[k:]
+        if ARGS.closing_taniyans:
+            # each taniyan ends with "ÁÁ"; keep the first N
+            kept, n_ = [], 0
+            for l in closing_lines:
+                if n_ >= ARGS.closing_taniyans: break
+                kept.append(l)
+                if re.search(r'ÁÁ\s*$', l): n_ += 1
+            closing_lines = kept
     body = body[:cut]
 
 # ---- group into display lines. Each PDF line is normally one line of the ślōka; in long metres
@@ -133,7 +147,8 @@ else:
         else:
             # unnumbered ślōkas after the numbered ones (Dēśikamaṅgaḷam's saptati ratna mālikā):
             # one section each, outside the first/last repeat rule
-            flush(group, nxt); appendix.add(nxt); labels[nxt] = 'श्लोकः'; nxt += 1
+            if not ARGS.drop_appendix:
+                flush(group, nxt); appendix.add(nxt); labels[nxt] = 'श्लोकः'; nxt += 1
         group = []
     if group:
         flush(group, nxt)
@@ -178,7 +193,7 @@ labels = {k: (dev(v[6:]) if v.startswith('KANDA:') else v) for k, v in labels.it
 verses = sorted({o['v'] for o in out if o['v'] not in (0, closing)})
 numbered = [v for v in verses if v not in appendix]
 first, last = numbered[0], numbered[-1]
-twice = {first} | set(numbered[-ARGS.repeat_last:])
+twice = ({first} if not ARGS.no_first_repeat else set()) | set(numbered[-ARGS.repeat_last:])
 if ARGS.gadyam:
     # Raghuvīra Gadyam: both closing ślōkas after the last kāṇḍa (caturmukhēśvara … and
     # kavikathakasiṃha …) are chanted twice

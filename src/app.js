@@ -265,15 +265,24 @@
   // ---------- sync mode ----------
   // Walks the timeline in playback order (repeats included). Space marks the start of the
   // highlighted line; S skips it if the recording doesn't actually say it there.
-  function startSync() {
+  // resume = carry on from where a partial sync stopped, keeping the lines already marked
+  function startSync(resume) {
     if (!player) return;
     closeSheet();
-    sync = { next: 0, marks: [], shown: -1 };
+    const done = resume === true ? syncedCount() : 0;
+    sync = { next: done, marks: times.slice(0, done).map((t, k) => t0(k)), shown: -1 };
     document.body.classList.add('syncing');
     $('syncBanner').classList.remove('hidden');
     player.loop = false;
-    player.seek(0); player.play();
+    // replay from the start of the last line already marked, so the next one can be caught as it begins
+    player.seek(done > 0 ? t0(done - 1) : 0); player.play();
     userScrollUntil = 0;
+  }
+  // how many lines at the start of the timeline have been marked by hand, for a partial sync
+  function syncedCount() {
+    const m = mine();
+    if (!Array.isArray(m.timings) || m.full !== false) return 0;
+    return Math.min(m.synced || 0, seq.length);
   }
   function lastMark() {
     for (let k = sync.marks.length - 1; k >= 0; k--) if (sync.marks[k] != null) return sync.marks[k];
@@ -317,7 +326,8 @@
       seq = newSeq;
       times = newTimes.map((t) => Math.round(t * 100) / 100);
       estimatedFor = null;
-      saveMine({ timings: times, seq, offset: 0, rev: revision() });
+      const marked = sync.marks.filter((m) => m != null).length;
+      saveMine({ timings: times, seq, offset: 0, rev: revision(), synced: marked, full: n === total });
       markVerses();
       $('offVal').textContent = '0.0s';
       toast((n === total ? 'Timings saved for every line ✓' : `Saved ${n} of ${total} lines — run Sync again later to finish.`)
@@ -345,6 +355,10 @@
     entry = -2; // refresh pill text
   }
   function updateTimingNote() {
+    const part = syncedCount();
+    $('btnResume').classList.toggle('hidden', !part);
+    if (part) $('btnResume').textContent = `Resume sync (${part} of ${seq.length} lines done)`;
+    if (part) { $('timingNote').textContent = `${item.iast} is partly synced: ${part} of ${seq.length} lines. “Resume sync” carries on from there (or press R).`; return; }
     $('timingNote').textContent = estimatedFor == null
       ? `Using your synced timings for ${item.iast}.`
       : `Timings for ${item.iast} are estimates. Use “Sync timings” once — tap Space as each line begins — to make them exact.`;
@@ -384,9 +398,11 @@
         b.querySelector('.lib-sub').textContent = s;
         b.querySelector('.lib-main').lang = cat.lang;
         b.querySelector('.lib-tag').textContent = it.available ? (item && it.id === item.id ? '♪' : '') : 'soon';
-        if (isSynced(it)) {
+        const st = isSynced(it);
+        if (st) {
           const ok = document.createElement('span');
-          ok.className = 'lib-synced'; ok.textContent = '✓'; ok.title = 'Timings synced';
+          ok.className = 'lib-synced ' + st; ok.textContent = '✓';
+          ok.title = st === 'full' ? 'Timings synced' : 'Partly synced: open it and press R (or ⚙ → Resume sync) to carry on';
           b.querySelector('.lib-tag').before(ok);
         }
         if (it.available) b.onclick = () => { closeLibrary(); selectSlokam(it.id, { play: true }); };
@@ -398,7 +414,8 @@
   function isSynced(it) {
     const m = S.slokams[it.id];
     const t = TEXTS[it.text];
-    return !!(m && Array.isArray(m.timings) && m.timings.length && t && (m.rev || 1) === (t.revision || 1));
+    if (!(m && Array.isArray(m.timings) && m.timings.length && t && (m.rev || 1) === (t.revision || 1))) return null;
+    return m.full === false ? 'partial' : 'full';
   }
   function openLibrary() {
     closeSheet(); buildLibrary();
@@ -427,6 +444,9 @@
   function bind() {
     $('btnPlay').onclick = togglePlay; $('pillPlay').onclick = togglePlay;
     $('btnPrev').onclick = () => prevTrack(); $('btnNext').onclick = () => nextTrack();
+    $('btnPrev').addEventListener('mouseenter', showPrevPreview);
+    $('btnPrev').addEventListener('mouseleave', () => $('prevPreview').classList.add('hidden'));
+    $('btnPrev').addEventListener('click', () => $('prevPreview').classList.add('hidden'));
     $('btnNext').addEventListener('mouseenter', showNextPreview);
     $('btnNext').addEventListener('mouseleave', () => $('nextPreview').classList.add('hidden'));
     $('btnNext').addEventListener('click', () => $('nextPreview').classList.add('hidden'));
@@ -446,7 +466,8 @@
     $('optLoop').onchange = (e) => { save({ loop: e.target.checked }); applyLook(); };
     $('offMinus').onclick = () => { saveMine({ offset: Math.round((offset() - 0.5) * 10) / 10 }); applyLook(); };
     $('offPlus').onclick = () => { saveMine({ offset: Math.round((offset() + 0.5) * 10) / 10 }); applyLook(); };
-    $('btnSync').onclick = startSync;
+    $('btnSync').onclick = () => startSync(false);
+    $('btnResume').onclick = () => startSync(true);
     $('btnMark').onclick = mark;
     $('btnSkip').onclick = skip;
     $('btnReset').onclick = () => {
@@ -494,6 +515,7 @@
         case 'KeyF': toggleFullscreen(); break;
         case 'KeyL': $('btnLibrary').click(); break;
         case 'KeyN': $('btnSettings').click(); break;
+        case 'KeyR': if (syncedCount()) startSync(true); break;
         case 'KeyQ': store.quit(); break;
         case 'Escape':
           if (!$('sheet').classList.contains('hidden')) closeSheet();
@@ -590,6 +612,20 @@
     const k = PLAYABLE.findIndex((it) => it.id === item.id);
     return PLAYABLE[(k + 1) % PLAYABLE.length];
   }
+  // what ⏮ will do: restart this slokam when more than 3 s in, otherwise go back to the previous one
+  function showPrevPreview() {
+    let label, it;
+    if (player && player.time() > 3) { label = 'Back to the start'; it = item; }
+    else if (S.shuffle && history.length) { label = 'Previous (shuffle)'; it = ITEMS[history[history.length - 1]]; }
+    else {
+      const k = PLAYABLE.findIndex((x) => x.id === item.id);
+      label = 'Previous'; it = PLAYABLE[(k - 1 + PLAYABLE.length) % PLAYABLE.length];
+    }
+    $('prevLabel').textContent = label;
+    $('prevName').textContent = it.native; $('prevName').lang = it.lang;
+    $('prevIast').textContent = it.iast;
+    $('prevPreview').classList.remove('hidden');
+  }
   function showNextPreview() {
     const n = upNext();
     $('nextName').textContent = n.native;
@@ -641,6 +677,8 @@
     applyLook();
     autoplay = play;
     loadPlayer();
+    const part = syncedCount();
+    if (part) setTimeout(() => toast(`Partly synced (${part} of ${seq.length} lines). Press R or ⚙ → Resume sync to carry on.`, 6000), 800);
   }
 
   // ---------- start ----------

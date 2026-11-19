@@ -260,4 +260,7 @@ body.page-mode .video-box { display: none; }
 .next-preview .next-name { font-family: var(--tamil); font-size: 12px; font-weight: 600; }
 .next-preview .next-iast { font-size: 10px; opacity: .65; }
 /* ✓ next to works whose timings you've synced */
-.lib-synced { color: #3ccf6e; font-size: 12px; font-weight: 700; margin-right: 2px; }
+.lib-synced { color: #3ccf6e; font-size: 12px; font-weight: 700; margin-right: 2px; }   /* green: fully synced */
+.lib-synced.partial { color: #4ea3ff; }                                                     /* blue: partly synced */
+/* ⏮'s preview sits at the left edge, so anchor it there instead of centring */
+.next-preview.prev { left: 0; transform: none; }

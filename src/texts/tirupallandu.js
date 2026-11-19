@@ -3,10 +3,10 @@
 // pāsurams marked ‡ in the PDF are said twice; a line with rep: 1 is said twice in a row.
 window.SLOKAM_TEXTS = window.SLOKAM_TEXTS || {};
 window.SLOKAM_TEXTS["tirupallandu"] = {
-  revision: 2,
+  revision: 3,
   verseWord: "பாசுரம்", verseCount: 11, labels: {"-1": "தனியன்", "-2": "தனியன்", "-3": "தனியன்", "-4": "தனியன்", "-5": "தனியன்", "-6": "தனியன்", "-7": "தனியன்", "-8": "தனியன்"},
   num: {"2": 1, "3": 2, "4": 3, "5": 4, "6": 5, "7": 6, "8": 7, "9": 8, "10": 9, "11": 10, "12": 11},   // number shown for a verse, where it differs from v
-  order: [-1, -2, -3, -4, -5, -6, -7, -8, 1, 1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 11, 12, 12],
+  order: [-1, -2, -3, -4, -5, -6, -7, -8, 1, 2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 11, 12, 12],
   lines: [
     {"v": -1, "text": "ராமாநுஜ த₃யாபாத்ரம் ஜ்ஞாநவைராக்₃ய பூ₄ஷணம்"},
     {"v": -1, "text": "ஶ்ரீமத்₃வேங்கடநாதா₂ர்யம் வந்தே₃ வேதா₃ந்ததே₃ஶிகம்"},

@@ -164,7 +164,14 @@ lines += out
 
 if args.no_repeat:
     repeated -= {int(x) for x in args.no_repeat.split(',')}
-order = [-n for n in range(1, len(taniyan_blocks) + 1)] + [v for v in reading for _ in range(2 if v in repeated else 1)]
+body_order = [v for v in reading for _ in range(2 if v in repeated else 1)]
+if args.join:
+    # joined verses that both repeat are chanted together twice: A B A B, not A A B B (Tirupallāṇḍu)
+    a_, b_ = map(int, args.join.split(','))
+    if a_ in repeated and b_ in repeated:
+        k = body_order.index(a_)
+        body_order[k:k + 4] = [a_, b_, a_, b_]
+order = [-n for n in range(1, len(taniyan_blocks) + 1)] + body_order
 if args.andadi:
     order.append(reading[0])   # an andādi closes the circle: pāsuram 1 once more at the end
 labels = {str(-n): 'தனியன்' for n in range(1, len(taniyan_blocks) + 1)}
