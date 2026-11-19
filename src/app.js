@@ -384,10 +384,21 @@
         b.querySelector('.lib-sub').textContent = s;
         b.querySelector('.lib-main').lang = cat.lang;
         b.querySelector('.lib-tag').textContent = it.available ? (item && it.id === item.id ? '♪' : '') : 'soon';
+        if (isSynced(it)) {
+          const ok = document.createElement('span');
+          ok.className = 'lib-synced'; ok.textContent = '✓'; ok.title = 'Timings synced';
+          b.querySelector('.lib-tag').before(ok);
+        }
         if (it.available) b.onclick = () => { closeLibrary(); selectSlokam(it.id, { play: true }); };
         sec.appendChild(b);
       });
     });
+  }
+  // a work you've synced by hand: timings saved for the current revision of its text
+  function isSynced(it) {
+    const m = S.slokams[it.id];
+    const t = TEXTS[it.text];
+    return !!(m && Array.isArray(m.timings) && m.timings.length && t && (m.rev || 1) === (t.revision || 1));
   }
   function openLibrary() {
     closeSheet(); buildLibrary();
@@ -416,7 +427,10 @@
   function bind() {
     $('btnPlay').onclick = togglePlay; $('pillPlay').onclick = togglePlay;
     $('btnPrev').onclick = () => prevTrack(); $('btnNext').onclick = () => nextTrack();
-    $('btnShuffle').onclick = () => { save({ shuffle: !S.shuffle }); applyShuffle(); toast(S.shuffle ? 'Shuffle on: ⏭ and the next slokam after one ends are picked at random.' : 'Shuffle off.', 2500); };
+    $('btnNext').addEventListener('mouseenter', showNextPreview);
+    $('btnNext').addEventListener('mouseleave', () => $('nextPreview').classList.add('hidden'));
+    $('btnNext').addEventListener('click', () => $('nextPreview').classList.add('hidden'));
+    $('btnShuffle').onclick = () => { save({ shuffle: !S.shuffle }); upcoming = null; applyShuffle(); toast(S.shuffle ? 'Shuffle on: ⏭ and the next slokam after one ends are picked at random.' : 'Shuffle off.', 2500); };
     $('btnMin').onclick = () => store.setCompact(true);
     $('btnFull').onclick = toggleFullscreen;
     $('btnRestore').onclick = () => store.setCompact(false);
@@ -479,6 +493,8 @@
         case 'KeyM': store.setCompact(!document.body.classList.contains('compact')); break;
         case 'KeyF': toggleFullscreen(); break;
         case 'KeyL': $('btnLibrary').click(); break;
+        case 'KeyN': $('btnSettings').click(); break;
+        case 'KeyQ': store.quit(); break;
         case 'Escape':
           if (!$('sheet').classList.contains('hidden')) closeSheet();
           else if (!$('library').classList.contains('hidden')) closeLibrary();
@@ -560,12 +576,34 @@
   const PLAYABLE = Object.values(ITEMS).filter((it) => it.available).sort((a, b) => a.n - b.n);
   // With shuffle on, "next" is a random other slokam, and "previous" walks back through the ones played.
   const history = [];
+  // what ⏭ (or the end of a slokam, with looping off) will play next. With shuffle on it's picked
+  // ahead of time, so the preview above ⏭ shows what will really play.
+  let upcoming = null;
+  function upNext() {
+    if (S.shuffle) {
+      if (!upcoming || upcoming.id === item.id) {
+        const others = PLAYABLE.filter((it) => it.id !== item.id);
+        upcoming = others[Math.floor(Math.random() * others.length)];
+      }
+      return upcoming;
+    }
+    const k = PLAYABLE.findIndex((it) => it.id === item.id);
+    return PLAYABLE[(k + 1) % PLAYABLE.length];
+  }
+  function showNextPreview() {
+    const n = upNext();
+    $('nextName').textContent = n.native;
+    $('nextName').lang = n.lang;
+    $('nextIast').textContent = n.iast;
+    $('nextLabel').textContent = S.shuffle ? 'Up next (shuffle)' : 'Up next';
+    $('nextPreview').classList.remove('hidden');
+  }
   function stepTrack(d, play) {
     const keepPlaying = play ?? !!(player && player.playing());
     let next;
     if (S.shuffle && d > 0) {
-      const others = PLAYABLE.filter((it) => it.id !== item.id);
-      next = others[Math.floor(Math.random() * others.length)];
+      next = upNext();
+      upcoming = null;
     } else if (S.shuffle && d < 0 && history.length) {
       return selectSlokam(history.pop(), { play: keepPlaying, back: true });
     } else {

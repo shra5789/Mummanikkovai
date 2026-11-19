@@ -145,8 +145,10 @@ The text generators in `tools/` apply these rules when they build each slokam's 
 | S | In Sync mode: skip a line that isn't recited there |
 | ↑ / ↓ | Previous / next line |
 | ← / ⏮ | Back to the start of the slokam (press again within 3 s for the previous slokam) |
-| → / ⏭ | Next slokam |
-| L | Open the slokam menu |
+| → / ⏭ | Next slokam (hover over ⏭ to see which one is up next) |
+| L | Open the Library |
+| N | Open settings |
+| Q | Quit |
 | F | Full screen on / off (Esc also leaves full screen) |
 | M | Minimize / expand |
 | Ctrl + Alt + L | Show / hide from anywhere |

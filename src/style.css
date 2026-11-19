@@ -247,3 +247,17 @@ body.compact .library { display: none !important; }
 body.page-mode .video-box { display: none; }
 
 .sheet .hint { opacity: .55; font-size: 10.5px; margin-left: 4px; }
+
+/* preview of the next slokam, shown above ⏭ on hover */
+.next-wrap { position: relative; display: inline-flex; }
+.next-preview {
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); z-index: 7;
+  display: flex; flex-direction: column; align-items: center; gap: 1px; white-space: nowrap; pointer-events: none;
+  padding: 5px 9px; border-radius: 8px; background: rgba(24, 22, 30, .97); border: 1px solid rgba(var(--fg), .15);
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+}
+.next-preview .next-label { font-size: 9px; opacity: .55; text-transform: uppercase; letter-spacing: .06em; }
+.next-preview .next-name { font-family: var(--tamil); font-size: 12px; font-weight: 600; }
+.next-preview .next-iast { font-size: 10px; opacity: .65; }
+/* ✓ next to works whose timings you've synced */
+.lib-synced { color: #3ccf6e; font-size: 12px; font-weight: 700; margin-right: 2px; }

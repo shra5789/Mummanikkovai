@@ -23,6 +23,8 @@ ap.add_argument('--gadyam', action='store_true', help='prose work (Raghuvīra Ga
 ap.add_argument('--repeat-closing-phrases', type=int, default=0, metavar='N',
                 help='gadyam: the last N prose phrases are chanted twice together '
                      '(Raghuvīra Gadyam: 2, śrīrāmabhadra ! namastē punastē namaḥ !)')
+ap.add_argument('--no-opening-taniyan', action='store_true',
+                help='leave out the opening taniyan (śrīmān vēṅkaṭanāthāryaḥ …) when the recording skips it')
 ap.add_argument('--one-line', metavar='N,N',
                 help='show these ślōkas each as a single line (Garuḍa Daṇḍakam: 2,3,4,5, the daṇḍaka sections)')
 ap.add_argument('--repeat-last', type=int, default=1, metavar='N',
@@ -183,6 +185,10 @@ if ARGS.gadyam:
     last_kanda = max(k for k, v in labels.items() if v.startswith('KANDA:') or 'काण्ड' in v)
     twice |= {v for v in verses if v > last_kanda}
 order = [0] + [v for v in verses for _ in range(2 if v in twice else 1)] + ([closing] if closing else [])
+if ARGS.no_opening_taniyan:
+    out = [o for o in out if o['v'] != 0]
+    order = [v for v in order if v != 0]
+    labels.pop(0, None)
 if not ARGS.gadyam:
     labels = {k: v for k, v in labels.items() if v == 'तनियन्' or k in appendix}
 
