@@ -114,6 +114,8 @@ Sync a slokam once and its timings are exact from then on:
    If a highlighted line isn't said at that point, press **S** (or *Skip*) and it's left out of the timeline.
    Press **Backspace** to undo a mark or skip, and **Esc** to stop early. Your marks are kept and the remaining lines shift to match.
 3. Your timings are saved on your PC, separately for each slokam. *Reset timings* goes back to the estimates.
+   When an update only changes the order near the end of a slokam (Dayāśatakam's repeat of ślōka 107), your
+   timings for everything before that are kept, and the slokam shows as partly synced so you only sync the rest.
 4. Stopped partway? The Library marks the slokam with a **blue ✓** (a fully synced one gets a **green ✓**).
    Open it and press **R**, or ⚙ → **Resume sync**: it replays from the last line you marked and carries on,
    keeping the marks you've already made.
@@ -131,8 +133,8 @@ If everything is consistently a bit early or late, use **Timing offset** (±0.5 
   Unnumbered verses (Tiruvezukūṟṟirukkai's closing verse, the bracketed verse in Adhikāra Saṅgraham) are chanted once.
 - **Andādis** (Irāmānuśa Nūṟṟandādi, Piḷḷai Andādi, Kaṇṇinuṇ Śiṟuttāmbu): after the last pāsuram, pāsuram 1 is
   chanted once more, and the lyrics jump back to it.
-- **Sanskrit Dēśika stōtras:** the first and last ślōkas are chanted twice. For Dayāśatakam that's ślōkas 1 and 108.
-  These repeat their first ślōka and their last two: Hayagrīvastōtram, Daśāvatārastōtram, Kāmāsikāṣṭakam,
+- **Sanskrit Dēśika stōtras:** the first and last ślōkas are chanted twice. For Dayāśatakam that's ślōkas 1, 107 and 108.
+  These repeat their first ślōka and their last two: Dayāśatakam, Hayagrīvastōtram, Daśāvatārastōtram, Kāmāsikāṣṭakam,
   Gōpālaviṃśati, Śrīstuti, Gōdāstuti, Sudarśanāṣṭakam, Garuḍa Daṇḍakam and Dēśikamaṅgaḷam. Ṣōḍaśāyudhastōtram
   repeats only its last two.
 - **Raghuvīra Gadyam:** the closing pair श्रीरामभद्र ! नमस्ते पुनस्ते नमः ! is chanted twice together, and both

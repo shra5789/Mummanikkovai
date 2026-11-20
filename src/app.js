@@ -109,10 +109,34 @@
   // a text's `revision` goes up when its lines change; timings synced to an older revision point
   // at the wrong lines, so they're dropped
   const revision = () => T.revision || 1;
+  let keptNotice = false;   // loadTimings just kept older timings and said so; skip the generic reminder
   function loadTimings() {
     const m = mine();
     const has = Array.isArray(m.timings) && Array.isArray(m.seq);
-    const stale = has && (m.rev || 1) !== revision();
+    let stale = has && (m.rev || 1) !== revision();
+    // A text update that only changed the order near the end can say that older timings are still
+    // right up to a given verse: keep those and leave the rest to be synced (as a partial sync).
+    const keepBefore = stale && T.keepTimingsBefore && T.keepTimingsBefore[m.rev || 1];
+    if (keepBefore && m.timings.length === m.seq.length) {
+      const firstLine = T.lines.findIndex((l) => l.v === keepBefore);
+      let k = 0;
+      while (k < m.seq.length && m.seq[k] < firstLine && m.seq[k] >= 0) k++;
+      const fresh = defaultSeq();
+      const from = fresh.findIndex((i) => i >= firstLine);
+      if (k > 0 && from >= 0) {
+        const keptSeq = m.seq.slice(0, k), keptTimes = m.timings.slice(0, k);
+        const restSeq = fresh.slice(from);
+        const est = estimate(fresh, knownDuration()).slice(from);
+        const shift = Math.max(0, keptTimes[k - 1] + 2 - est[0]);   // keep the rest after what's kept
+        const wasDone = m.full === false ? Math.min(m.synced || 0, k) : k;
+        saveMine({
+          seq: keptSeq.concat(restSeq), timings: keptTimes.concat(est.map((t) => Math.round((t + shift) * 100) / 100)),
+          rev: revision(), synced: wasDone, full: false,
+        });
+        stale = false; keptNotice = true;
+        setTimeout(() => toast(`The order of ${item.iast} changed from ${T.verseWord} ${keepBefore} on. Your timings before that are kept — press R to sync the rest.`, 9000), 600);
+      }
+    }
     if (stale) {
       saveMine({ timings: null, seq: null, rev: null });
       setTimeout(() => toast(`The text of ${item.iast} was updated, so your synced timings for it no longer fit. Please run Sync timings again.`, 9000), 600);
@@ -677,8 +701,9 @@
     applyLook();
     autoplay = play;
     loadPlayer();
+    setTimeout(() => { keptNotice = false; }, 0);
     const part = syncedCount();
-    if (part) setTimeout(() => toast(`Partly synced (${part} of ${seq.length} lines). Press R or ⚙ → Resume sync to carry on.`, 6000), 800);
+    if (part && !keptNotice) setTimeout(() => toast(`Partly synced (${part} of ${seq.length} lines). Press R or ⚙ → Resume sync to carry on.`, 6000), 800);
   }
 
   // ---------- start ----------

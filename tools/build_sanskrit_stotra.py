@@ -23,6 +23,9 @@ ap.add_argument('--gadyam', action='store_true', help='prose work (Raghuvīra Ga
 ap.add_argument('--repeat-closing-phrases', type=int, default=0, metavar='N',
                 help='gadyam: the last N prose phrases are chanted twice together '
                      '(Raghuvīra Gadyam: 2, śrīrāmabhadra ! namastē punastē namaḥ !)')
+ap.add_argument('--keep-timings-before', metavar='REV:VERSE',
+                help='timings synced at revision REV are still right for every line before ślōka VERSE '
+                     '(when only the order from VERSE on changed); the app keeps them and asks to sync the rest')
 ap.add_argument('--no-first-repeat', action='store_true',
                 help='the first ślōka is chanted only once (Ṣōḍaśāyudhastōtram)')
 ap.add_argument('--drop-appendix', action='store_true',
@@ -215,6 +218,9 @@ print('window.SLOKAM_TEXTS = window.SLOKAM_TEXTS || {};')
 print('window.SLOKAM_TEXTS[%s] = {' % json.dumps(ARGS.id))
 if ARGS.revision > 1:
     print('  revision: %d,' % ARGS.revision)
+if ARGS.keep_timings_before:
+    r_, v_ = ARGS.keep_timings_before.split(':')
+    print('  keepTimingsBefore: { %s: %s },   // revision: ślōka — older timings stay right before this ślōka' % (r_, v_))
 print('  verseWord: "श्लोकः", verseCount: %d, labels: %s,' % (len(numbered), json.dumps({str(k): v for k, v in labels.items()}, ensure_ascii=False)))
 print('  order: %s,' % json.dumps(order))
 print('  lines: [')
